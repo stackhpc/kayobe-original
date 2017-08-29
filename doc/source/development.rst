@@ -9,7 +9,7 @@ Preparation
 ===========
 
 First, ensure that Vagrant is installed and correctly configured to use
-virtual box. Also install the following vagrant plugins:
+virtual box. Also install the following vagrant plugins::
 
    vagrant plugin install vagrant-vbguest
    vagrant plugin install vagrant-reload
