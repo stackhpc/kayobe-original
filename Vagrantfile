@@ -103,5 +103,26 @@ EOF
     pip install -U pip
     pip install /vagrant
     deactivate
+
+    cat > ~/quickstart.sh << EOF
+source ~/kayobe-venv/bin/activate
+source /vagrant/kayobe-env
+
+cd /vagrant
+kayobe control host bootstrap
+kayobe overcloud host configure
+#kayobe overcloud container image build
+kayobe overcloud container image pull
+kayobe overcloud service deploy
+source ${KOLLA_CONFIG_PATH:-/etc/kolla}/admin-openrc.sh
+kayobe overcloud post configure
+cat ${KOLLA_CONFIG_PATH:-/etc/kolla}/admin-openrc.sh
+EOF
+    chmod +x ~/quickstart.sh
+  SHELL
+
+  # NOTE: remove "cat" to execute the quick start on vagrant up
+  config.vm.provision "shell", privileged: false, inline: <<-SHELL
+    cat ~/quickstart.sh
   SHELL
 end
