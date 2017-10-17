@@ -35,9 +35,9 @@ Example Playbook
 The following playbook configures Node Exporter.
 
     ---
-    - hosts: nodeexporter
+    - hosts: node-exporter
       roles:
-        - role: nodeexporter
+        - role: node-exporter
 
 Author Information
 ------------------
