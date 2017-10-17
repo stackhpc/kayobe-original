@@ -3,6 +3,7 @@
   docker_container:
     image: "{{ item.value.image }}"
     name: "{{ item.value.container_name }}"
+    command: "{{ item.value.command }}"
     network_mode: "host"
     privileged: "{{ item.value.privileged | default(omit) }}"
     read_only: "{{ item.value.read_only | default(omit) }}"
