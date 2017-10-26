@@ -81,4 +81,4 @@ kolla_openstack_custom_config:
   - src: "{{ kolla_extra_config_path }}/swift"
     dest: "{{ kolla_node_custom_config_path }}/swift"
     patterns: "*"
-    enabled: "{{ kolla_enable_swift }}" 
+    enabled: "{{ kolla_enable_swift }}"
