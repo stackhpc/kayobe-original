@@ -2,7 +2,7 @@
 # Roughly follows kolla-ansible's service deployment patterns.
 
 # Whether Node Exporter is enabled.
-nodeexporter_enabled: true
+nodeexporter_enabled: false
 
 # Service deployment definition.
 nodeexporter_services:
