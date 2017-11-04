@@ -5,9 +5,16 @@
 function config_defaults {
     # Set default values for kayobe development configuration.
 
+    # Try to detect if we are running in a vagrant VM.
+    if [[ -e /vagrant ]]; then
+        KAYOBE_SOURCE_PATH_DEFAULT=/vagrant
+    else
+        KAYOBE_SOURCE_PATH_DEFAULT=$(pwd)
+    fi
+
     # Path to the kayobe source code repository. Typically this will be the
     # Vagrant shared directory.
-    export KAYOBE_SOURCE_PATH=${KAYOBE_SOURCE_PATH:-/vagrant}
+    export KAYOBE_SOURCE_PATH=${KAYOBE_SOURCE_PATH:-$KAYOBE_SOURCE_PATH_DEFAULT}
 
     # Path to the kayobe-config repository checkout.
     export KAYOBE_CONFIG_SOURCE_PATH=${KAYOBE_CONFIG_SOURCE_PATH:-${KAYOBE_SOURCE_PATH}/config/src/kayobe-config}
