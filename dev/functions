@@ -59,7 +59,11 @@ function config_init {
 
 function install_dependencies {
     echo "Installing package dependencies for kayobe"
-    sudo yum -y install gcc git vim python-virtualenv
+    if [[ -e /etc/centos-release ]]; then
+        sudo yum -y install gcc git vim python-virtualenv
+    else
+        sudo apt install -y python-dev python-virtualenv gcc git
+    fi
 }
 
 function install_venv {
@@ -86,15 +90,19 @@ function is_deploy_image_built_locally {
     [[ $ipa_build_images =~ ^true$ ]]
 }
 
+function environment_setup {
+    source ${KAYOBE_VENV_PATH}/bin/activate
+    source ${KAYOBE_CONFIG_SOURCE_PATH}/kayobe-env
+
+    cd ${KAYOBE_SOURCE_PATH}
+}
+
 function overcloud_deploy {
     # Deploy a kayobe control plane.
     echo "Deploying a kayobe development environment. This consists of a "
     echo "single node OpenStack control plane."
 
-    source ${KAYOBE_VENV_PATH}/bin/activate
-    source ${KAYOBE_CONFIG_SOURCE_PATH}/kayobe-env
-
-    cd ${KAYOBE_SOURCE_PATH}
+    environment_setup
 
     echo "Bootstrapping the ansible control host"
     kayobe control host bootstrap
