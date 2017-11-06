@@ -20,8 +20,7 @@ install:
   - venv/bin/pip install tox
 
   # Clone development configuration.
-  - mkdir -p config/src
-  - git clone https://github.com/stackhpc/dev-kayobe-config -b dev-config-mk-1 config/src/kayobe-config
+  - tools/travis-setup.sh
 
   # Install kayobe control host environment.
   - dev/install.sh
@@ -36,25 +35,5 @@ script:
 #  # Run python2.7 unit tests.
 #  - venv/bin/tox -e py27
 
-  # Use a bridge with no external interfaces.
-  - >
-    sed -i
-    -e 's/aio_interface\: breth1/aio_interface: braio/g'
-    -e 's/aio_bridge_ports\:/aio_bridge_ports: []/g'
-    -e '/  \- eth1/d'
-    config/src/kayobe-config/etc/kayobe/inventory/group_vars/controllers/network-interfaces
-  - sudo ip l add braio type bridge
-  - sudo ip l set braio up
-  - sudo ip a add 192.168.33.3/24 dev braio
-
-  # Enable SSH access.
-  - ssh-keygen -t rsa -N '' -f ~/.ssh/id_rsa
-  - cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
-  - chmod 0600 ~/.ssh/authorized_keys
-  - >
-    sed -i
-    -e "s/controller_bootstrap_user\: vagrant/controller_bootstrap_user: $USER/g"
-    config/src/kayobe-config/etc/kayobe/controllers.yml
-
-  # Deploy a single host control plane.
-  - dev/overcloud-deploy.sh
+  # Deploy the control plane.
+  - venv/bin/tox -e overcloud-deploy
