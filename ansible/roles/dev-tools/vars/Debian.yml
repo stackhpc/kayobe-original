@@ -1,0 +1,5 @@
+---
+# List of default packages to install.
+dev_tools_packages_default:
+  - tcpdump
+  - vim
