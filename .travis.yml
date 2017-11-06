@@ -2,8 +2,8 @@
 language: python
 python: "2.7"
 
-# Use the new container infrastructure
-sudo: false
+# Use a VM.
+sudo: required
 
 # Install ansible
 addons:
@@ -11,18 +11,29 @@ addons:
     packages:
       - gcc
       - python-virtualenv
+      - realpath
 
 install:
+  # Install a virtualenv for tox.
   - virtualenv venv
   - venv/bin/pip install -U pip
   - venv/bin/pip install tox
 
+  # Clone development configuration.
+  - tools/travis-setup.sh
+
+  # Install kayobe control host environment.
+  - dev/install.sh
+
 script:
-  # Run python style checks.
-  - venv/bin/tox -e pep8
+#  # Run python style checks.
+#  - venv/bin/tox -e pep8
+#
+#  # Build documentation.
+#  - venv/bin/tox -e docs
+#
+#  # Run python2.7 unit tests.
+#  - venv/bin/tox -e py27
 
-  # Build documentation.
-  - venv/bin/tox -e docs
-
-  # Run python2.7 unit tests.
-  - venv/bin/tox -e py27
+  # Deploy the control plane.
+  - venv/bin/tox -e overcloud-deploy
