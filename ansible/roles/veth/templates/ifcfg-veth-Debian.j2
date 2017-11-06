@@ -1,7 +1,7 @@
 {% if item.bootproto == 'static' %}
 auto {{ item.device }}
 iface {{ item.device }} inet static
-{% if item.mtu is defined %}
+{% if item.mtu is defined and item.mtu %}
 mtu {{ item.mtu }}
 {% endif %}
 {% if item.address is defined %}

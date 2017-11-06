@@ -1,7 +1,7 @@
 {% if item.peer_bootproto == 'static' %}
 auto {{ item.peer_device }}
 iface {{ item.peer_device }} inet static
-{% if item.peer_mtu is defined %}
+{% if item.peer_mtu is defined and item.peer_mtu %}
 mtu {{ item.peer_mtu }}
 {% endif %}
 {% if item.peer_address is defined %}
