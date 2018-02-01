@@ -1,0 +1,11 @@
+---
+# Cloud-init ‘s searches for network configuration in order of 
+# increasing precedence; each item overriding the previous.
+# In some cases cloud-init reconfigure automatically network interface
+# and cause some issues in network configuration
+- name: Ensure Cloud-init is disabled and its artifacts are removed
+  hosts: overcloud
+  tags:
+    - disable-cloud-init
+  roles:
+    - role: disable-cloud-init

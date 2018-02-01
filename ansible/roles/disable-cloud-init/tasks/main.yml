@@ -1,0 +1,24 @@
+---
+- name: Check for existing CLoud-init systemd services
+  command: systemctl list-units cloud-init*.service --no-legend --no-pager --state=loaded
+  register: cloud_init_services
+  changed_when: False
+
+- name: Ensure Cloud-init services are stopped and disabled
+  service:
+    name: "{{ item.split()[0] }}"
+    state: stopped
+    enabled: no
+  with_items: "{{ cloud_init_services.stdout_lines }}"
+  become: True
+
+
+- name: Ensure Cloud-init artifacts are removed
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - "/usr/lib/systemd/system/cloud-init@.service"
+  become: True
+  notify:
+    - Reload systemd daemon
