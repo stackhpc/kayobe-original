@@ -12,19 +12,6 @@
   with_items: "{{ cloud_init_services.stdout_lines }}"
   become: True
 
-- name: Find interface configuration files created by Cloud-init 
-  find:
-    path: "/etc/sysconfig/network-scripts"
-    pattern: "ifcfg-*"
-    # Created by cloud-init on instance boot automatically, do not edit.
-  register: interface_configs
-
-- name: Ensure interface configuration files created by Cloud-init are removed
-  file:
-    path: "{{ item }}"
-    state: absent
-  with_items: "{{ interface_configs.files | map(attribute='path') | list }}"
-  become: True
 
 - name: Ensure Cloud-init artifacts are removed
   file:
