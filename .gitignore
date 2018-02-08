@@ -57,3 +57,6 @@ ansible/kolla-venv/
 
 # Vagrant
 .vagrant
+
+# Molecule
+.molecule/
