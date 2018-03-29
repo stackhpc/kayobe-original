@@ -123,7 +123,7 @@ overcloud_container_image_regex_map:
   - regex: dnsmasq
     enabled: "{{ kolla_enable_ironic | bool }}"
   - regex: elasticsearch
-    enabled: "{{ kolla_enable_elasticsearch | bool }}"
+    enabled: "{{ kolla_enable_elasticsearch | bool or kolla_enable_monasca | bool }}"
   - regex: etcd
     enabled: "{{ kolla_enable_etcd | bool }}"
   - regex: fluentd
@@ -141,13 +141,13 @@ overcloud_container_image_regex_map:
   - regex: horizon
     enabled: "{{ kolla_enable_horizon | bool }}"
   - regex: influxdb
-    enabled: "{{ kolla_enable_influxdb | bool }}"
+    enabled: "{{ kolla_enable_influxdb | bool or kolla_enable_monasca | bool }}"
   - regex: ironic
     enabled: "{{ kolla_enable_ironic | bool }}"
   - regex: iscsid
     enabled: "{{ kolla_enable_cinder | bool or kolla_enable_ironic | bool }}"
   - regex: kafka
-    enabled: "{{ kolla_enable_kafka | bool }}"
+    enabled: "{{ kolla_enable_kafka | bool or kolla_enable_monasca | bool }}"
   - regex: keepalived
     enabled: "{{ kolla_enable_haproxy | bool }}"
   - regex: keystone
@@ -166,6 +166,8 @@ overcloud_container_image_regex_map:
     enabled: True
   - regex: memcached
     enabled: True
+  - regex: monasca
+    enabled: "{{ kolla_enable_monasca | bool }}"
   - regex: neutron-server
     enabled: "{{ kolla_enable_neutron | bool }}"
   # Neutron SFC agent not currently supported on CentOS binary builds.
@@ -186,7 +188,7 @@ overcloud_container_image_regex_map:
   - regex: tgtd
     enabled: "{{ kolla_enable_cinder | bool or kolla_enable_ironic | bool }}"
   - regex: zookeeper
-    enabled: "{{ kolla_enable_zookeeper | bool or kolla_enable_kafka | bool }}"
+    enabled: "{{ kolla_enable_zookeeper | bool or kolla_enable_kafka | bool or kolla_enable_monasca | bool }}"
 
 # List of regular expressions matching names of container images to build for
 # overcloud hosts.

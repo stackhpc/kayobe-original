@@ -26,6 +26,14 @@
     - { src: kafka.server.properties.j2, dest: kafka.server.properties, enabled: "{{ kolla_enable_kafka }}" }
     - { src: magnum.conf.j2, dest: magnum.conf, enabled: "{{ kolla_enable_magnum }}" }
     - { src: ml2_conf.ini.j2, dest: neutron/ml2_conf.ini, enabled: "{{ kolla_enable_neutron }}" }
+    - { src: api-config.conf.j2, dest: monasca/api-conf.conf, enabled: "{{ kolla_enable_monasca }}" }
+    - { src: log-api.conf.j2, dest: monasca/log-api.conf, enabled: "{{ kolla_enable_monasca }}" }
+    - { src: log-transformer.conf.j2, dest: monasca/log-transformer.conf, enabled: "{{ kolla_enable_monasca }}" }
+    - { src: log-persister.conf.j2, dest: monasca/log-persister.conf, enabled: "{{ kolla_enable_monasca }}" }
+    - { src: log-metrics.conf.j2, dest: monasca/log-metrics.conf, enabled: "{{ kolla_enable_monasca }}" }
+    - { src: thresh-config.yml.j2, dest: monasca/thresh-config.yml, enabled: "{{ kolla_enable_monasca }}" }
+    - { src: notification.conf.j2, dest: monasca/notification.conf, enabled: "{{ kolla_enable_monasca }}" }
+    - { src: persister.conf.j2, dest: monasca/persister.conf, enabled: "{{ kolla_enable_monasca }}" }
     - { src: murano.conf.j2, dest: murano.conf, enabled: "{{ kolla_enable_murano }}" }
     - { src: neutron.conf.j2, dest: neutron.conf, enabled: "{{ kolla_enable_neutron }}" }
     - { src: nova.conf.j2, dest: nova.conf, enabled: "{{ kolla_enable_nova }}" }

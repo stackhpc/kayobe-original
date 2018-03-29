@@ -229,6 +229,7 @@
               #enable_manila_backend_generic: True
               #enable_manila_backend_hnas: True
               #enable_mistral: True
+              #enable_monasca: True
               #enable_mongodb: True
               #enable_murano: True
               #enable_multipathd: True

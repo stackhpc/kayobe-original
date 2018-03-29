@@ -118,6 +118,7 @@
               - enable_ironic
               - enable_kafka
               - enable_influxdb
+              - enable_monasca
               - enable_neutron
               - enable_nova
               - enable_zookeeper
