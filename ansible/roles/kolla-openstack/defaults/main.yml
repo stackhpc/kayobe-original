@@ -288,6 +288,21 @@ kolla_enable_manila:
 # Whether to enable Monasca.
 kolla_enable_monasca:
 
+# Free form extra configuration to append to api-config.conf
+kolla_extra_monasca_api:
+
+# Free form extra configuration to append to log-api.conf
+kolla_extra_monasca_log_api:
+
+# Free form extra configuration to append to log-transformer.conf
+kolla_extra_monasca_log_transformer:
+
+# Free form extra configuration to append to log-persister.conf
+kolla_extra_monasca_log_transformer:
+
+# Free form extra configuration to append to log-metrics.conf
+kolla_extra_monasca_log_metrics:
+
 ###############################################################################
 # Murano configuration.
 

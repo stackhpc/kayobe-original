@@ -65,8 +65,23 @@ provisioner:
           [extra-magnum.conf]
           foo=bar
         kolla_enable_manila: True
-        kolla_enable_murano: True
         kolla_enable_monasca: True
+        kolla_extra_monasca_api: |
+          [extra-api-config.conf]
+          foo=bar
+        kolla_extra_monasca_log_api: |
+          [extra-log-api.conf]
+          foo=bar
+        kolla_extra_monasca_log_transformer: |
+          [extra-log-transformer.conf]
+          foo=bar
+        kolla_extra_monasca_log_persister: |
+          [extra-log-persister.conf]
+          foo=bar
+        kolla_extra_monasca_log_metrics: |
+          [extra-log-metrics.conf]
+          foo=bar
+        kolla_enable_murano: True
         kolla_extra_murano: |
           [extra-murano.conf]
           foo=bar
