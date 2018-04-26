@@ -82,6 +82,7 @@ kolla_feature_flags:
   - horizon
   - influxdb
   - ironic
+  - ironic_ipxe
   - kafka
   - karbor
   - kibana
