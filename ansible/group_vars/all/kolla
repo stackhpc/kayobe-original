@@ -13,7 +13,7 @@ kolla_source_url: "https://github.com/stackhpc/kolla"
 
 # Version (branch, tag, etc.) of Kolla source code repository if type is
 # 'source'.
-kolla_source_version: "stackhpc/pike"
+kolla_source_version: "feature/logstash"
 
 # Path to virtualenv in which to install kolla.
 kolla_venv: "{{ virtualenv_path ~ '/kolla' }}"
@@ -35,7 +35,7 @@ kolla_ansible_source_url: "https://github.com/stackhpc/kolla-ansible"
 
 # Version (branch, tag, etc.) of Kolla Ansible source code repository if type
 # is 'source'.
-kolla_ansible_source_version: "stackhpc/pike"
+kolla_ansible_source_version: "feature/monasca_logstash"
 
 # Path to virtualenv in which to install kolla-ansible.
 kolla_ansible_venv: "{{ lookup('env', 'KOLLA_VENV_PATH') | default(lookup('env', 'PWD') ~ '/venvs/kolla-ansible', true) }}"
