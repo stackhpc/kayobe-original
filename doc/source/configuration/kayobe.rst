@@ -15,6 +15,17 @@ touching the system configuration directory by setting the environment variable
 host will by default be located in ``/etc/kolla`` and can be overridden via
 ``KOLLA_CONFIG_PATH``.
 
+Ansible Inventory Location
+--------------------------
+
+The Ansible inventory for Kayobe is by default stored under an ``inventory``
+directory in the Kayobe configuration directory.  The path to the inventory
+can be overridden by using the one of the command line arguments ``-i`` or
+``--inventory``, or by setting the environment variable
+``KAYOBE_INVENTORY_PATH``.  Changing the default can be useful when a single
+Kayobe configuration provides multiple inventories, for example to support
+development, staging/preproduction and production environments.
+
 Configuration Directory Layout
 ==============================
 
@@ -32,6 +43,43 @@ the Ansible inventory.  An example of the directory structure is as follows::
             host1-vars
             host2-vars
         hosts
+
+An example of a Kayobe configuration with multiple inventories is as follows::
+
+    extra-vars1.yml
+    extra-vars2.yml
+    inventory/
+        development/
+            group_vars/
+                group1-vars
+                group2-vars
+            groups
+            host_vars/
+                host1-vars
+                host2-vars
+            hosts
+        production/
+            group_vars/
+                group1-vars
+                group2-vars
+            groups
+            host_vars/
+                host1-vars
+                host2-vars
+            hosts
+        staging/
+            group_vars/
+                group1-vars
+                group2-vars
+            groups
+            host_vars/
+                host1-vars
+                host2-vars
+            hosts
+
+In this case we could set
+``$KAYOBE_INVENTORY_PATH=$KAYOBE_CONFIG_PATH/inventory/production`` in order to
+use the production inventory.
 
 Configuration Patterns
 ======================

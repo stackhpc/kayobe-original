@@ -28,6 +28,8 @@ DEFAULT_CONFIG_PATH = "/etc/kayobe"
 
 CONFIG_PATH_ENV = "KAYOBE_CONFIG_PATH"
 
+INVENTORY_PATH_ENV = "KAYOBE_INVENTORY_PATH"
+
 LOG = logging.getLogger(__name__)
 
 
@@ -49,9 +51,10 @@ def add_args(parser):
                              "YAML/JSON")
     parser.add_argument("-i", "--inventory", metavar="INVENTORY",
                         help="specify inventory host path "
-                             "(default=$%s/inventory or %s/inventory) or "
-                             "comma-separated host list" %
-                             (CONFIG_PATH_ENV, DEFAULT_CONFIG_PATH))
+                             "(default=$%s or $%s/inventory or %s/inventory) "
+                             "or comma-separated host list" %
+                             (INVENTORY_PATH_ENV, CONFIG_PATH_ENV,
+                              DEFAULT_CONFIG_PATH))
     parser.add_argument("-l", "--limit", metavar="SUBSET",
                         help="further limit selected hosts to an additional "
                              "pattern")
@@ -70,9 +73,12 @@ def add_args(parser):
 def _get_inventory_path(parsed_args):
     """Return the path to the Kayobe inventory."""
     if parsed_args.inventory:
+        # Specified via -i / --inventory.
         return parsed_args.inventory
     else:
-        return os.path.join(parsed_args.config_path, "inventory")
+        # Use $KAYOBE_INVENTORY_PATH, or $KAYOBE_CONFIG_PATH/inventory.
+        kc_inventory = os.path.join(parsed_args.config_path, "inventory")
+        return os.getenv(INVENTORY_PATH_ENV, kc_inventory)
 
 
 def _validate_args(parsed_args, playbooks):

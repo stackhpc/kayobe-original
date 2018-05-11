@@ -218,6 +218,54 @@ class TestCase(unittest.TestCase):
     @mock.patch.object(utils, "run_command")
     @mock.patch.object(ansible, "_get_vars_files")
     @mock.patch.object(ansible, "_validate_args")
+    @mock.patch.dict(os.environ, {"KAYOBE_CONFIG_PATH": "/path/to/config"},
+                     clear=True)
+    def test_run_playbooks_config_path_env(self, mock_validate, mock_vars,
+                                           mock_run):
+        mock_vars.return_value = []
+        parser = argparse.ArgumentParser()
+        ansible.add_args(parser)
+        vault.add_args(parser)
+        parsed_args = parser.parse_args([])
+        ansible.run_playbooks(parsed_args, ["playbook1.yml"])
+        expected_cmd = [
+            "ansible-playbook",
+            "--inventory", "/path/to/config/inventory",
+            "playbook1.yml",
+        ]
+        expected_env = {"KAYOBE_CONFIG_PATH": "/path/to/config"}
+        mock_run.assert_called_once_with(expected_cmd, quiet=False,
+                                         env=expected_env)
+        mock_vars.assert_called_once_with("/path/to/config")
+
+    @mock.patch.object(utils, "run_command")
+    @mock.patch.object(ansible, "_get_vars_files")
+    @mock.patch.object(ansible, "_validate_args")
+    @mock.patch.dict(os.environ,
+                     {"KAYOBE_INVENTORY_PATH": "/path/to/inventory"},
+                     clear=True)
+    def test_run_playbooks_inventory_path_env(self, mock_validate, mock_vars,
+                                              mock_run):
+        mock_vars.return_value = []
+        parser = argparse.ArgumentParser()
+        ansible.add_args(parser)
+        vault.add_args(parser)
+        parsed_args = parser.parse_args([])
+        ansible.run_playbooks(parsed_args, ["playbook1.yml"])
+        expected_cmd = [
+            "ansible-playbook",
+            "--inventory", "/path/to/inventory",
+            "playbook1.yml",
+        ]
+        expected_env = {"KAYOBE_CONFIG_PATH": "/etc/kayobe",
+                        "KAYOBE_INVENTORY_PATH": "/path/to/inventory"}
+        mock_run.assert_called_once_with(expected_cmd, quiet=False,
+                                         env=expected_env)
+        mock_vars.assert_called_once_with("/etc/kayobe")
+
+    @mock.patch.object(utils, "run_command")
+    @mock.patch.object(ansible, "_get_vars_files")
+    @mock.patch.object(ansible, "_validate_args")
     @mock.patch.dict(os.environ, clear=True)
     def test_run_playbooks_func_args(self, mock_validate, mock_vars, mock_run):
         mock_vars.return_value = ["/etc/kayobe/vars-file1.yml",
