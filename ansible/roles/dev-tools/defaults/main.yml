@@ -1,8 +1,0 @@
----
-# List of default packages to install.
-dev_tools_packages_default:
-  - tcpdump
-  - vim
-
-# List of packages to install.
-dev_tools_packages: "{{ dev_tools_packages_default }}"

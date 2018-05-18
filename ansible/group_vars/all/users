@@ -1,7 +1,0 @@
----
-################################################################################
-# User configuration.
-
-# List of users to create. This should be in a format accepted by the
-# singleplatform-eng.users role.
-users_default: []

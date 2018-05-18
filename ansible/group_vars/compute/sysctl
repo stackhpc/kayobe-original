@@ -1,3 +1,0 @@
----
-# Dict of sysctl parameters to set.
-sysctl_parameters: "{{ compute_sysctl_parameters }}"

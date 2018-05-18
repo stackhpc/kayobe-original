@@ -1,6 +1,0 @@
----
-###############################################################################
-# Network interface attachments.
-
-# List of networks to which these nodes are attached.
-network_interfaces: "{{ compute_network_interfaces | unique | list }}"

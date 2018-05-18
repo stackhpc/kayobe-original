@@ -1,3 +1,0 @@
----
-# Dict of sysctl parameters to set.
-sysctl_parameters: "{{ seed_hypervisor_sysctl_parameters }}"
