@@ -1191,3 +1191,11 @@ class BaremetalComputeUpdateDeploymentImage(KayobeAnsibleMixin, VaultMixin,
             )
         self.run_kayobe_playbooks(parsed_args, playbooks,
                                   extra_vars=extra_vars)
+
+class BaremetalComputeRename(KayobeAnsibleMixin, VaultMixin, Command):
+    """Rename baremetal compute nodes to match inventory hostname"""
+
+    def take_action(self, parsed_args):
+        self.app.LOG.debug("Renaming baremetal compute nodes")
+        playbooks = _build_playbook_list("baremetal-compute-rename")
+        self.run_kayobe_playbooks(parsed_args, playbooks)
