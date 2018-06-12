@@ -47,6 +47,7 @@ testinfra_hosts = testinfra.utils.ansible_runner.AnsibleRunner(
      'neutron',
      'nova',
      'sahara',
+     'storm',
      'swift',
      'zookeeper'])
 def test_service_config_directory(host, path):
@@ -77,6 +78,7 @@ def test_service_config_directory(host, path):
      'neutron.conf',
      'nova.conf',
      'sahara.conf',
+     'storm.yaml',
      'zookeeper.cfg'])
 def test_service_ini_file(host, path):
     # TODO(mgoddard): Check more of config file contents.

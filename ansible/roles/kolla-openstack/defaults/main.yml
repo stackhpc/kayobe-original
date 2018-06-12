@@ -386,6 +386,15 @@ kolla_enable_sahara:
 kolla_extra_sahara:
 
 ###############################################################################
+# Storm configuration.
+
+# Whether to enable Storm.
+kolla_enable_storm:
+
+# Free form extra configuration to append to storm.yaml.
+kolla_extra_storm:
+
+###############################################################################
 # Swift configuration.
 
 # Whether to enable swift.
