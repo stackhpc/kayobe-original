@@ -115,6 +115,7 @@ kolla_feature_flags:
   - senlin
   - skydive
   - solum
+  - storm
   - swift
   - tacker
   - telegraf
