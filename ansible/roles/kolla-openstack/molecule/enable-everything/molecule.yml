@@ -100,6 +100,10 @@ provisioner:
         kolla_extra_sahara: |
           [extra-sahara.conf]
           foo=bar
+        kolla_enable_storm: True
+        kolla_extra_storm: |
+          [extra-storm.yaml]
+          foo=bar
         kolla_enable_swift: True
         kolla_enable_zookeeper: True
         kolla_extra_zookeeper: |
