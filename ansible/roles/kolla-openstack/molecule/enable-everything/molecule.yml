@@ -81,6 +81,10 @@ provisioner:
         kolla_extra_monasca_log_metrics: |
           [extra-log-metrics.conf]
           foo=bar
+        kolla_extra_monasca_thresh: |
+          [extra-thresh-config.yml]
+          # TODO: Use valid yaml
+          foo=bar
         kolla_enable_murano: True
         kolla_extra_murano: |
           [extra-murano.conf]

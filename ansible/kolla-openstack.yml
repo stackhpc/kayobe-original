@@ -115,6 +115,7 @@
             - { name: monasca, file: monasca/log-transformer.conf }
             - { name: monasca, file: monasca/log-persister.conf }
             - { name: monasca, file: monasca/log-metrics.conf }
+            - { name: monasca, file: monasca/thresh-config.yml }
             - { name: murano, file: murano.conf }
             - { name: neutron, file: neutron.conf }
             - { name: neutron_ml2, file: neutron/ml2_conf.ini }
@@ -219,6 +220,7 @@
       kolla_extra_ironic_dnsmasq: "{{ kolla_extra_config.ironic_dnsmasq | default }}"
       kolla_extra_kafka: "{{ kolla_extra_config.kafka | default }}"
       kolla_extra_magnum: "{{ kolla_extra_config.magnum | default }}"
+      # TODO: Need one for each
       kolla_extra_monasca: "{{ kolla_extra_config.monasca | default }}"
       kolla_extra_murano: "{{ kolla_extra_config.murano | default }}"
       kolla_extra_neutron: "{{ kolla_extra_config.neutron | default }}"

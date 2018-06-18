@@ -303,6 +303,9 @@ kolla_extra_monasca_log_transformer:
 # Free form extra configuration to append to log-metrics.conf
 kolla_extra_monasca_log_metrics:
 
+# Free form extra configuration to append to thresh-config.yml
+kolla_extra_monasca_thresh:
+
 ###############################################################################
 # Murano configuration.
 

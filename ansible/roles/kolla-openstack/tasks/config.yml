@@ -31,6 +31,7 @@
     - { src: log-transformer.conf.j2, dest: monasca/log-transformer.conf, enabled: "{{ kolla_enable_monasca }}" }
     - { src: log-persister.conf.j2, dest: monasca/log-persister.conf, enabled: "{{ kolla_enable_monasca }}" }
     - { src: log-metrics.conf.j2, dest: monasca/log-metrics.conf, enabled: "{{ kolla_enable_monasca }}" }
+    - { src: thresh-config.yml.j2, dest: monasca/thresh-config.yml, enabled: "{{ kolla_enable_monasca }}" }
     - { src: murano.conf.j2, dest: murano.conf, enabled: "{{ kolla_enable_murano }}" }
     - { src: neutron.conf.j2, dest: neutron.conf, enabled: "{{ kolla_enable_neutron }}" }
     - { src: nova.conf.j2, dest: nova.conf, enabled: "{{ kolla_enable_nova }}" }
