@@ -116,6 +116,8 @@
             - { name: monasca, file: monasca/log-persister.conf }
             - { name: monasca, file: monasca/log-metrics.conf }
             - { name: monasca, file: monasca/thresh-config.yml }
+            - { name: monasca, file: monasca/notification.conf }
+            - { name: monasca, file: monasca/perister.conf }
             - { name: murano, file: murano.conf }
             - { name: neutron, file: neutron.conf }
             - { name: neutron_ml2, file: neutron/ml2_conf.ini }

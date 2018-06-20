@@ -85,6 +85,12 @@ provisioner:
           [extra-thresh-config.yml]
           # TODO: Use valid yaml
           foo=bar
+        kolla_extra_monasca_notification: |
+          [extra-notification.conf]
+          foo=bar
+        kolla_extra_monasca_persister: |
+          [extra-persister.conf]
+          foo=bar
         kolla_enable_murano: True
         kolla_extra_murano: |
           [extra-murano.conf]

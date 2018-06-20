@@ -306,6 +306,12 @@ kolla_extra_monasca_log_metrics:
 # Free form extra configuration to append to thresh-config.yml
 kolla_extra_monasca_thresh:
 
+# Free form extra configuration to append to notification.conf
+kolla_extra_monasca_notification:
+
+# Free form extra configuration to append to persister.conf
+kolla_extra_monasca_persister:
+
 ###############################################################################
 # Murano configuration.
 
