@@ -91,6 +91,7 @@ kolla_feature_flags:
   - manila
   - manila_backend_generic
   - manila_backend_hnas
+  - mariadb
   - mistral
   - mongodb
   - monasca
