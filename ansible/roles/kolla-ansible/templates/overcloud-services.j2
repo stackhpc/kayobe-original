@@ -197,6 +197,13 @@ monasca
 [monasca-persister:children]
 monasca
 
+# Spark
+[spark-master:children]
+spark
+
+[spark-slave:children]
+spark
+
 # Storm
 [storm-worker:children]
 storm

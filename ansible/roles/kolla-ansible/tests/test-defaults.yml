@@ -121,6 +121,7 @@
               - enable_monasca
               - enable_neutron
               - enable_nova
+              - enable_spark
               - enable_storm
               - enable_zookeeper
               - grafana_admin_username

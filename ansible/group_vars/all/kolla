@@ -183,6 +183,8 @@ overcloud_container_image_regex_map:
     enabled: "{{ kolla_enable_sahara | bool }}"
   - regex: skydive
     enabled: "{{ kolla_enable_skydive | bool }}"
+  - regex: spark
+    enabled: "{{ kolla_enable_spark | bool or kolla_enable_monasca | bool }}"
   - regex: storm
     enabled: "{{ kolla_enable_storm | bool or kolla_enable_monasca | bool }}"
   - regex: swift
@@ -323,6 +325,7 @@ kolla_enable_nova: "yes"
 kolla_enable_osprofiler: "no"
 kolla_enable_sahara: "no"
 kolla_enable_skydive: "no"
+kolla_enable_spark: "no"
 kolla_enable_storm: "no"
 kolla_enable_swift: "no"
 kolla_enable_zookeeper: "{{ 'yes' if kolla_enable_kafka | bool else 'no' }}"
