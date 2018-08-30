@@ -20,7 +20,7 @@
     device: "{{ item.journal }}"
   with_items: "{{ ceph_disks }}"
   register: "disk_journal_info"
-  when: 
+  when:
     - item.journal is defined
 
 - name: Fail if the Ceph OSD disks have already a partition

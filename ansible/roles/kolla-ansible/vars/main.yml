@@ -88,6 +88,7 @@ kolla_feature_flags:
   - influxdb
   - ironic
   - ironic_ipxe
+  - ironic_neutron_agent
   - ironic_pxe_uefi
   - kafka
   - karbor
@@ -99,6 +100,7 @@ kolla_feature_flags:
   - manila_backend_hnas
   - manila_backend_cephfs_native
   - manila_backend_cephfs_nfs
+  - mariadb
   - mistral
   - mongodb
   - monasca
