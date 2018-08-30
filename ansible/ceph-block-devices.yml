@@ -1,6 +1,6 @@
 ---
 - name: Ensure Ceph disk are tagged
-  hosts: overcloud 
+  hosts: overcloud
   tags:
     - kolla-ceph
   roles:

@@ -19,7 +19,6 @@ from cliff.command import Command
 
 from kayobe import ansible
 from kayobe import kolla_ansible
-from kayobe import utils
 from kayobe import vault
 
 
@@ -114,13 +113,13 @@ class ControlHostBootstrap(KayobeAnsibleMixin, VaultMixin, Command):
     """Bootstrap the Kayobe control environment.
 
     * Downloads and installs Ansible roles from Galaxy.
-    * Generates an SSH key for the ansible control host, if one does not exist.
-    * Installs kolla-ansible on the ansible control host.
+    * Generates an SSH key for the Ansible control host, if one does not exist.
+    * Installs kolla-ansible on the Ansible control host.
     """
 
     def take_action(self, parsed_args):
-        self.app.LOG.debug("Bootstrapping Kayobe control host")
-        utils.galaxy_install("requirements.yml", "ansible/roles")
+        self.app.LOG.debug("Bootstrapping Kayobe Ansible control host")
+        ansible.install_galaxy_roles(parsed_args)
         playbooks = _build_playbook_list("bootstrap")
         self.run_kayobe_playbooks(parsed_args, playbooks)
         playbooks = _build_playbook_list("kolla-ansible")
@@ -131,15 +130,14 @@ class ControlHostUpgrade(KayobeAnsibleMixin, VaultMixin, Command):
     """Upgrade the Kayobe control environment.
 
     * Downloads and installs updated Ansible roles from Galaxy.
-    * Generates an SSH key for the ansible control host, if one does not exist.
-    * Updates kolla-ansible on the ansible control host.
+    * Generates an SSH key for the Ansible control host, if one does not exist.
+    * Updates kolla-ansible on the Ansible control host.
     """
 
     def take_action(self, parsed_args):
-        self.app.LOG.debug("Upgrading Kayobe control host")
+        self.app.LOG.debug("Upgrading Kayobe Ansible control host")
         # Use force to upgrade roles.
-        utils.galaxy_install("requirements.yml", "ansible/roles",
-                             force=True)
+        ansible.install_galaxy_roles(parsed_args, force=True)
         playbooks = _build_playbook_list("bootstrap")
         self.run_kayobe_playbooks(parsed_args, playbooks)
         playbooks = _build_playbook_list("kolla-ansible")
@@ -588,7 +586,7 @@ class OvercloudIntrospectionDataSave(KayobeAnsibleMixin, VaultMixin, Command):
     """Save hardware introspection data for the overcloud.
 
     Save hardware introspection data from the seed's ironic inspector service
-    to the control host.
+    to the Ansible control host.
     """
 
     def get_parser(self, prog_name):
@@ -915,7 +913,7 @@ class OvercloudServiceDeploy(KollaAnsibleMixin, KayobeAnsibleMixin, VaultMixin,
 
         # Deploy kayobe extra services.
         playbooks = _build_playbook_list("overcloud-extras")
-        extra_vars = {"action": "deploy"}
+        extra_vars = {"kayobe_action": "deploy"}
         self.run_kayobe_playbooks(parsed_args, playbooks,
                                   extra_vars=extra_vars)
 
@@ -972,7 +970,7 @@ class OvercloudServiceReconfigure(KollaAnsibleMixin, KayobeAnsibleMixin,
 
         # Reconfigure kayobe extra services.
         playbooks = _build_playbook_list("overcloud-extras")
-        extra_vars = {"action": "reconfigure"}
+        extra_vars = {"kayobe_action": "reconfigure"}
         self.run_kayobe_playbooks(parsed_args, playbooks,
                                   extra_vars=extra_vars)
 
@@ -1025,7 +1023,7 @@ class OvercloudServiceUpgrade(KollaAnsibleMixin, KayobeAnsibleMixin,
 
         # Upgrade kayobe extra services.
         playbooks = _build_playbook_list("overcloud-extras")
-        extra_vars = {"action": "upgrade"}
+        extra_vars = {"kayobe_action": "upgrade"}
         self.run_kayobe_playbooks(parsed_args, playbooks,
                                   extra_vars=extra_vars)
 
@@ -1071,7 +1069,7 @@ class OvercloudServiceDestroy(KollaAnsibleMixin, KayobeAnsibleMixin,
 
         # Destroy kayobe extra services.
         playbooks = _build_playbook_list("overcloud-extras")
-        extra_vars = {"action": "destroy"}
+        extra_vars = {"kayobe_action": "destroy"}
         self.run_kayobe_playbooks(parsed_args, playbooks,
                                   extra_vars=extra_vars)
 
@@ -1092,7 +1090,7 @@ class OvercloudContainerImagePull(KayobeAnsibleMixin, KollaAnsibleMixin,
 
         # Pull container images for kayobe extra services.
         playbooks = _build_playbook_list("overcloud-extras")
-        extra_vars = {"action": "pull"}
+        extra_vars = {"kayobe_action": "pull"}
         self.run_kayobe_playbooks(parsed_args, playbooks,
                                   extra_vars=extra_vars)
 

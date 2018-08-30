@@ -23,6 +23,8 @@
             kolla_node_custom_config_path: "{{ temp_path }}/etc/kolla/config"
             kolla_ansible_passwords_path: "{{ temp_path }}/passwords.yml"
             # Config.
+            kolla_ansible_user: "fake-user"
+            kolla_ansible_group: "fake-group"
             kolla_base_distro: "fake-distro"
             kolla_install_type: "fake-install-type"
             kolla_docker_namespace: "fake-namespace"
@@ -49,6 +51,7 @@
             kolla_bifrost_network_interface: "eth8"
             kolla_provision_interface: "eth9"
             kolla_inspector_dnsmasq_interface: "eth10"
+            kolla_tunnel_interface: "eth11"
             kolla_neutron_ml2_type_drivers:
               - "fake-ml2-type-1"
               - "fake-ml2-type-2"
@@ -85,6 +88,7 @@
             kolla_enable_horizon: True
             kolla_enable_influxdb: True
             kolla_enable_ironic: True
+            kolla_enable_ironic_neutron_agent: True
             kolla_enable_kafka: True
             kolla_enable_karbor: True
             kolla_enable_kibana: True
@@ -93,6 +97,7 @@
             kolla_enable_manila: True
             kolla_enable_manila_backend_generic: True
             kolla_enable_manila_backend_hnas: True
+            kolla_enable_mariadb: True
             kolla_enable_mistral: True
             kolla_enable_monasca: True
             kolla_enable_mongodb: True
@@ -164,6 +169,8 @@
             globals_yml: "{{ lookup('file', temp_path ~ '/etc/kolla/globals.yml') | from_yaml }}"
             expected_variables:
               config_strategy: "COPY_ALWAYS"
+              kolla_user: "fake-user"
+              kolla_group: "fake-group"
               kolla_base_distro: "fake-distro"
               kolla_install_type: "fake-install-type"
               openstack_release: "fake-release"
@@ -185,6 +192,7 @@
               neutron_bridge_name: "br0,br1"
               bifrost_network_interface: "eth8"
               ironic_dnsmasq_interface: "eth10"
+              tunnel_interface: "eth11"
               neutron_plugin_agent: "openvswitch"
               kolla_enable_tls_external: False
               kolla_external_fqdn_cert: "fake-cert"
@@ -219,6 +227,7 @@
               #enable_horizon: True
               #enable_influxdb: True
               #enable_ironic: True
+              #enable_ironic_neutron_agent: True
               #enable_kafka: True
               #enable_karbor: True
               #enable_kibana: True
@@ -227,6 +236,7 @@
               #enable_manila: True
               #enable_manila_backend_generic: True
               #enable_manila_backend_hnas: True
+              #enable_mariadb: True
               #enable_mistral: True
               #enable_mongodb: True
               #enable_murano: True

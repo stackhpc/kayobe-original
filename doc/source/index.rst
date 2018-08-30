@@ -35,6 +35,7 @@ Advanced Documentation
    :maxdepth: 2
 
    control-plane-service-placement
+   custom-ansible-playbooks
 
 Developer Documentation
 -----------------------
@@ -46,6 +47,10 @@ Developer Documentation
 
 Release Notes
 -------------
+
+`Release Notes <https://docs.openstack.org/releasenotes/kayobe/>`__
+
+Release notes for the Kayobe 3.1.0 release and earlier are found here:
 
 .. toctree::
    :maxdepth: 2

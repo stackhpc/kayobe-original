@@ -131,7 +131,7 @@ function seed_hypervisor_deploy {
     # Deploy a seed hypervisor.
     environment_setup
 
-    echo "Bootstrapping the ansible control host"
+    echo "Bootstrapping the Ansible control host"
     run_kayobe control host bootstrap
 
     echo "Configuring the seed hypervisor"
@@ -142,7 +142,7 @@ function seed_deploy {
     # Deploy a kayobe seed in a VM.
     environment_setup
 
-    echo "Bootstrapping the ansible control host"
+    echo "Bootstrapping the Ansible control host"
     run_kayobe control host bootstrap
 
     if [[ ${KAYOBE_SEED_VM_PROVISION} = 1 ]]; then
@@ -182,7 +182,7 @@ function overcloud_deploy {
 
     environment_setup
 
-    echo "Bootstrapping the ansible control host"
+    echo "Bootstrapping the Ansible control host"
     run_kayobe control host bootstrap
 
     echo "Configuring the controller host"
@@ -214,4 +214,25 @@ function overcloud_deploy {
     run_kayobe overcloud post configure
 
     echo "Control plane deployment complete"
+}
+
+function overcloud_test {
+    # Perform a simple smoke test against the cloud.
+    echo "Performing a simple smoke test"
+
+    environment_setup
+
+    pip install python-openstackclient
+
+    echo "Running kolla-ansible init-runonce"
+    source "${KOLLA_CONFIG_PATH:-/etc/kolla}/admin-openrc.sh"
+    ${KOLLA_VENV_PATH:-$HOME/kolla-venv}/share/kolla-ansible/init-runonce
+
+    echo "Creating a VM"
+    openstack server create --wait --image cirros --flavor m1.tiny --key-name mykey --network demo-net demo1
+    openstack server show demo1
+    # TODO(mgoddard): Test SSH connectivity to the VM.
+
+    echo "Deleting the VM"
+    openstack server delete --wait demo1
 }

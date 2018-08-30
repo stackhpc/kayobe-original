@@ -23,6 +23,9 @@ kolla_ansible_target_venv:
 # into the kolla-ansible venv.
 kolla_upper_constraints_file:
 
+# Whether to install the epel-release package.
+kolla_ansible_install_epel: true
+
 # Password to use to encrypt the passwords.yml file.
 kolla_ansible_vault_password:
 
@@ -34,6 +37,16 @@ kolla_node_custom_config_path:
 
 # Path to kolla-ansible passwords.yml input file.
 kolla_ansible_passwords_path:
+
+# User account to use for Kolla SSH access.
+kolla_ansible_user: kolla
+
+# Primary group of Kolla SSH user.
+kolla_ansible_group: kolla
+
+# Whether to use privilege escalation for all operations performed via Kolla
+# Ansible.
+kolla_ansible_become: true
 
 ###############################################################################
 # Kolla-ansible inventory configuration.
@@ -143,6 +156,7 @@ kolla_api_interface:
 kolla_storage_interface:
 kolla_cluster_interface:
 kolla_dns_interface:
+kolla_tunnel_interface:
 
 # This is the raw interface given to neutron as its external network port. Even
 # though an IP address can exist on this interface, it will be unusable in most

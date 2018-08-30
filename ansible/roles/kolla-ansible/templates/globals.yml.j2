@@ -48,6 +48,12 @@ kolla_external_vip_address: "{{ kolla_external_vip_address }}"
 # kolla_external_vip_address.
 kolla_external_fqdn: "{{ kolla_external_fqdn }}"
 
+# User account to use for Kolla SSH access.
+kolla_user: "{{ kolla_ansible_user }}"
+
+# Primary group of Kolla SSH user.
+kolla_group: "{{ kolla_ansible_group }}"
+
 ################
 # Docker options
 ################
@@ -102,7 +108,7 @@ kolla_external_vip_interface: "{{ kolla_external_vip_interface }}"
 storage_interface: "{{ kolla_storage_interface }}"
 cluster_interface: "{{ kolla_cluster_interface }}"
 dns_interface: "{{ kolla_dns_interface }}"
-# NOTE: tunnel_interface is unused.
+tunnel_interface: "{{ kolla_tunnel_interface }}"
 
 # This is the raw interface given to neutron as its external network port. Even
 # though an IP address can exist on this interface, it will be unusable in most
@@ -397,6 +403,8 @@ grafana_admin_username: "{{ grafana_local_admin_user_name }}"
 {% if kolla_selinux_state is not none %}
 selinux_state: {{ kolla_selinux_state }}
 {% endif %}
+
+install_epel: {{ kolla_ansible_install_epel | bool }}
 
 {% if kolla_extra_globals %}
 #######################

@@ -44,6 +44,7 @@
             kolla_bifrost_network_interface: "eth8"
             kolla_provision_interface: "eth9"
             kolla_inspector_dnsmasq_interface: "eth10"
+            kolla_tunnel_interface: "eth11"
             kolla_enable_tls_external: False
             kolla_enable_grafana: False
             kolla_external_fqdn_cert: "fake-cert"
@@ -91,10 +92,13 @@
               neutron_bridge_name: "br0,br1"
               bifrost_network_interface: "eth8"
               ironic_dnsmasq_interface: "eth10"
+              tunnel_interface: "eth11"
               neutron_plugin_agent: "openvswitch"
               kolla_enable_tls_external: False
               kolla_external_fqdn_cert: "fake-cert"
               openstack_logging_debug: False
+              kolla_user: "kolla"
+              kolla_group: "kolla"
 
         - name: Validate variables are absent from globals.yml
           assert:
@@ -115,8 +119,10 @@
               - neutron_tenant_network_types
               - enable_glance
               - enable_ironic
+              - enable_ironic_neutron_agent
               - enable_kafka
               - enable_influxdb
+              - enable_mariadb
               - enable_neutron
               - enable_nova
               - enable_zookeeper

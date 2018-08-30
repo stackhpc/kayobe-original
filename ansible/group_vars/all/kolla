@@ -112,6 +112,8 @@ overcloud_container_image_regex_map:
     enabled: "{{ kolla_enable_barbican | bool }}"
   - regex: ceilometer
     enabled: "{{ kolla_enable_ceilometer | bool }}"
+  - regex: ceph
+    enabled: "{{ kolla_enable_ceph | bool }}"
   - regex: cinder
     enabled: "{{ kolla_enable_cinder | bool }}"
   - regex: collectd
@@ -144,6 +146,8 @@ overcloud_container_image_regex_map:
     enabled: "{{ kolla_enable_influxdb | bool }}"
   - regex: ironic
     enabled: "{{ kolla_enable_ironic | bool }}"
+  - regex: ironic-neutron-agent
+    enabled: "{{ kolla_enable_ironic_neutron_agent | bool }}"
   - regex: iscsid
     enabled: "{{ kolla_enable_cinder | bool or kolla_enable_ironic | bool }}"
   - regex: kafka
@@ -160,6 +164,8 @@ overcloud_container_image_regex_map:
     enabled: "{{ kolla_enable_magnum | bool }}"
   - regex: manila
     enabled: "{{ kolla_enable_manila | bool }}"
+  - regex: mariadb
+    enabled: "{{ kolla_enable_mariadb | bool }}"
   - regex: murano
     enabled: "{{ kolla_enable_murano | bool }}"
   - regex: mariadb
@@ -171,6 +177,8 @@ overcloud_container_image_regex_map:
   # Neutron SFC agent not currently supported on CentOS binary builds.
   - regex: "neutron-\\(dhcp\\|l3\\|metadata\\|openvswitch\\)-agent"
     enabled: "{{ kolla_enable_neutron | bool }}"
+  - regex: neutron-lbaas-agent
+    enabled: "{{ kolla_enable_neutron_lbaas | bool }}"
   - regex: nova
     enabled: "{{ kolla_enable_nova | bool }}"
   - regex: openvswitch
@@ -185,6 +193,8 @@ overcloud_container_image_regex_map:
     enabled: "{{ kolla_enable_skydive | bool }}"
   - regex: swift
     enabled: "{{ kolla_enable_swift | bool }}"
+  - regex: telegraf
+    enabled: "{{ kolla_enable_telegraf | bool }}"
   - regex: tgtd
     enabled: "{{ kolla_enable_cinder | bool or kolla_enable_ironic | bool }}"
   - regex: zookeeper
@@ -288,6 +298,16 @@ kolla_openstack_logging_debug: "False"
 # Upper constraints file for installation of Kolla.
 kolla_upper_constraints_file: "https://raw.githubusercontent.com/openstack/requirements/stable/queens/upper-constraints.txt"
 
+# User account to use for Kolla SSH access.
+kolla_ansible_user: kolla
+
+# Primary group of Kolla SSH user.
+kolla_ansible_group: kolla
+
+# Whether to use privilege escalation for all operations performed via Kolla
+# Ansible.
+kolla_ansible_become: true
+
 ###############################################################################
 # Kolla feature flag configuration.
 
@@ -311,15 +331,18 @@ kolla_enable_horizon: "yes"
 kolla_enable_influxdb: "no"
 kolla_enable_ironic: "yes"
 kolla_enable_ironic_ipxe: "no"
+kolla_enable_ironic_neutron_agent: "{{ 'yes' if kolla_enable_neutron | bool and kolla_enable_ironic | bool else 'no' }}"
 kolla_enable_kafka: "no"
 kolla_enable_kibana: "{{ 'yes' if kolla_enable_central_logging | bool else 'no' }}"
 kolla_enable_magnum: "no"
 kolla_enable_manila: "no"
+kolla_enable_mariadb: "yes"
 # Support for Monasca in Kolla is a work in progress. This currently relies
 # on an out-of-band Monasca installation.
 kolla_enable_monasca: "no"
 kolla_enable_murano: "no"
 kolla_enable_neutron: "yes"
+kolla_enable_neutron_lbaas: "no"
 kolla_enable_neutron_provider_networks: "no"
 kolla_enable_nova: "yes"
 kolla_enable_osprofiler: "no"
@@ -327,6 +350,7 @@ kolla_enable_prometheus: "no"
 kolla_enable_sahara: "no"
 kolla_enable_skydive: "no"
 kolla_enable_swift: "no"
+kolla_enable_telegraf: "no"
 kolla_enable_zookeeper: "{{ 'yes' if kolla_enable_kafka | bool else 'no' }}"
 
 ###############################################################################
