@@ -48,7 +48,7 @@
         source {{ kolla_venv }}/bin/activate &&
         kolla-build \
         --config-dir {{ kolla_build_config_path }} \
-        --type {{ kolla_install_type }} \
+        {% if item.type is defined %}--type {{ item.type }}{% endif %} \
         {% if kolla_docker_registry is not none %}--registry {{ kolla_docker_registry }}{% endif %} \
         {% if push_images | bool %}--push{% endif %} \
         {{ item.regexes }} 2>&1 | tee --append {{ kolla_build_log_path }}
