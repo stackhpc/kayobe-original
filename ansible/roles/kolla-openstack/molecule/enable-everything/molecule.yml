@@ -43,7 +43,7 @@ provisioner:
         kolla_extra_influxdb: |
           [extra-influxdb.conf]
           foo=bar
-        kolla_enable_ironic: True
+        kolla_enable_ironic: true
         kolla_extra_ironic: |
           [extra-ironic.conf]
           foo=bar
