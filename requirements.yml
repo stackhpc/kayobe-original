@@ -13,6 +13,8 @@
 - src: singleplatform-eng.users
   version: v1.2.5
 - src: stackhpc.parted-1-1
+- src: stackhpc.dell-powerconnect-switch
+  version: v1.0.0
 - src: stackhpc.drac
   version: 1.1.4
 - src: stackhpc.drac-facts
