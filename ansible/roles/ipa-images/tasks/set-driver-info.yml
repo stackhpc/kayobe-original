@@ -32,7 +32,7 @@
   when:
     - item.Name is not none
     - item.Name not in groups["baremetal-compute"]
-  with_items: "{{ ipa_images_ironic_node_list.stdout | from_json }}"
+  with_items: "{{ ipa_images_ironic_node_list.stdout | default('{}') | from_json }}"
 
 - name: Set fact containing filtered list of nodes
   set_fact:
@@ -45,7 +45,7 @@
 - name: Update a fact containing the ironic nodes
   set_fact:
     ipa_images_ironic_nodes: "{{ ipa_images_ironic_nodes + [item] }}"
-  with_items: "{{ ipa_images_ironic_node_list.stdout | from_json }}"
+  with_items: "{{ ipa_images_ironic_node_list.stdout | default('{}') | from_json }}"
   when: item['Name'] in ipa_images_compute_node_whitelist
 
 - name: Ensure ironic nodes use the new Ironic Python Agent (IPA) images

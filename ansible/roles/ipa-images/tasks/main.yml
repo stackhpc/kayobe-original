@@ -23,8 +23,7 @@
 - name: Compute the MD5 checksum of the Ironic Python Agent (IPA) images
   stat:
     path: "{{ ipa_images_cache_path }}/{{ item }}"
-    get_checksum: True
-    checksum_algorithm: md5
+    get_md5: True
     mime: False
   with_items:
     - "{{ ipa_images_kernel_name }}"
@@ -86,11 +85,11 @@
   with_items:
     - name: "{{ ipa_images_kernel_name }}"
       created_at: "{{ ipa_images_kernel_openstack_image.created_at | default }}"
-      checksum: "{{ ipa_images_checksum.results[0].stat.checksum }}"
+      checksum: "{{ ipa_images_checksum.results[0].stat.md5 }}"
       glance_checksum: "{{ ipa_images_kernel_openstack_image.checksum | default }}"
     - name: "{{ ipa_images_ramdisk_name }}"
       created_at: "{{ ipa_images_ramdisk_openstack_image.created_at | default }}"
-      checksum: "{{ ipa_images_checksum.results[1].stat.checksum }}"
+      checksum: "{{ ipa_images_checksum.results[1].stat.md5 }}"
       glance_checksum: "{{ ipa_images_ramdisk_openstack_image.checksum | default }}"
   when:
     - item.glance_checksum
@@ -113,7 +112,7 @@
       format: ari
   register: ipa_images_new_images
 
-- include_tasks: set-driver-info.yml
+- include: set-driver-info.yml
   when: ipa_images_update_ironic_nodes | bool
 
 - name: Deactivate the virtualenv
