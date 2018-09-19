@@ -36,7 +36,7 @@
 
 - name: Set fact containing filtered list of nodes
   set_fact:
-    ipa_images_compute_node_whitelist: "{{ query('inventory_hostnames', ipa_images_compute_node_limit) | unique }}"
+    ipa_images_compute_node_whitelist: "{{ lookup('inventory_hostnames', ipa_images_compute_node_limit).split(',') | unique }}"
 
 - name: Initialise a fact containing the ironic nodes
   set_fact:
