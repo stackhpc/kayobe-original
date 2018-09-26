@@ -43,10 +43,12 @@ testinfra_hosts = testinfra.utils.ansible_runner.AnsibleRunner(
      'magnum',
      'manila',
      'mariadb',
+     'monasca',
      'murano',
      'neutron',
      'nova',
      'sahara',
+     'storm',
      'swift',
      'zookeeper'])
 def test_service_config_directory(host, path):

@@ -43,7 +43,7 @@ provisioner:
         kolla_extra_influxdb: |
           [extra-influxdb.conf]
           foo=bar
-        kolla_enable_ironic: True
+        kolla_enable_ironic: true
         kolla_extra_ironic: |
           [extra-ironic.conf]
           foo=bar
@@ -67,8 +67,8 @@ provisioner:
         kolla_extra_mariadb: |
           [extra-galera.cnf]
           foo=bar
-        kolla_enable_murano: true
         kolla_enable_monasca: true
+        kolla_enable_murano: true
         kolla_extra_murano: |
           [extra-murano.conf]
           foo=bar
@@ -88,6 +88,7 @@ provisioner:
           [extra-sahara.conf]
           foo=bar
         kolla_enable_swift: true
+        kolla_enable_storm: true
         kolla_enable_zookeeper: true
         kolla_extra_zookeeper: |
           [extra-zookeeper.cfg]

@@ -183,12 +183,14 @@ overcloud_container_image_regex_map:
     enabled: "{{ kolla_enable_sahara | bool }}"
   - regex: skydive
     enabled: "{{ kolla_enable_skydive | bool }}"
+  - regex: storm
+    enabled: "{{ kolla_enable_storm | bool }}"
   - regex: swift
     enabled: "{{ kolla_enable_swift | bool }}"
   - regex: tgtd
     enabled: "{{ kolla_enable_cinder | bool or kolla_enable_ironic | bool }}"
   - regex: zookeeper
-    enabled: "{{ kolla_enable_zookeeper | bool or kolla_enable_kafka | bool }}"
+    enabled: "{{ kolla_enable_zookeeper | bool }}"
 
 # List of regular expressions matching names of container images to build for
 # overcloud hosts.
@@ -311,25 +313,23 @@ kolla_enable_ceilometer: "no"
 kolla_enable_cinder: "no"
 kolla_enable_collectd: "no"
 kolla_enable_designate: "no"
-kolla_enable_elasticsearch: "{{ 'yes' if kolla_enable_central_logging | bool or kolla_enable_freezer | bool or kolla_enable_osprofiler | bool or kolla_enable_skydive | bool else 'no' }}"
+kolla_enable_elasticsearch: "{{ 'yes' if kolla_enable_central_logging | bool or kolla_enable_freezer | bool or kolla_enable_osprofiler | bool or kolla_enable_skydive | bool or kolla_enable_monasca | bool else 'no' }}"
 kolla_enable_etcd: "no"
 kolla_enable_freezer: "no"
 kolla_enable_glance: "yes"
-kolla_enable_grafana: "no"
+kolla_enable_grafana: "{{ 'yes' if kolla_enable_monasca | bool else 'no' }}"
 kolla_enable_gnocchi: "no"
 kolla_enable_haproxy: "yes"
 kolla_enable_heat: "yes"
 kolla_enable_horizon: "yes"
-kolla_enable_influxdb: "no"
+kolla_enable_influxdb: "{{ 'yes' if kolla_enable_monasca | bool else 'no' }}"
 kolla_enable_ironic: "yes"
 kolla_enable_ironic_ipxe: "no"
-kolla_enable_kafka: "no"
-kolla_enable_kibana: "{{ 'yes' if kolla_enable_central_logging | bool else 'no' }}"
+kolla_enable_kafka: "{{ 'yes' if kolla_enable_monasca | bool else 'no' }}"
+kolla_enable_kibana: "{{ 'yes' if kolla_enable_central_logging | bool or kolla_enable_monasca | bool  else 'no' }}"
 kolla_enable_magnum: "no"
 kolla_enable_manila: "no"
 kolla_enable_mariadb: "yes"
-# Support for Monasca in Kolla is a work in progress. This currently relies
-# on an out-of-band Monasca installation.
 kolla_enable_monasca: "no"
 kolla_enable_murano: "no"
 kolla_enable_neutron: "yes"
@@ -338,8 +338,9 @@ kolla_enable_nova: "yes"
 kolla_enable_osprofiler: "no"
 kolla_enable_sahara: "no"
 kolla_enable_skydive: "no"
+kolla_enable_storm: "{{ 'yes' if kolla_enable_monasca | bool else 'no' }}"
 kolla_enable_swift: "no"
-kolla_enable_zookeeper: "{{ 'yes' if kolla_enable_kafka | bool else 'no' }}"
+kolla_enable_zookeeper: "{{ 'yes' if kolla_enable_kafka | bool or kolla_enable_storm | bool else 'no' }}"
 
 ###############################################################################
 # Passwords and credentials.
