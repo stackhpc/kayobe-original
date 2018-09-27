@@ -64,6 +64,11 @@ kolla_openstack_custom_config:
     dest: "{{ kolla_node_custom_config_path }}/influxdb"
     patterns: "*"
     enabled: "{{ kolla_enable_influxdb }}"
+  # Storm.
+  - src: "{{ kolla_extra_config_path }}/storm"
+    dest: "{{ kolla_node_custom_config_path }}/storm"
+    patterns: "*"
+    enabled: "{{ kolla_enable_storm }}"
   # Ironic.
   - src: "{{ kolla_extra_config_path }}/ironic"
     dest: "{{ kolla_node_custom_config_path }}/ironic"
@@ -101,6 +106,11 @@ kolla_openstack_custom_config:
     dest: "{{ kolla_node_custom_config_path }}/mariadb"
     patterns: "*"
     enabled: "{{ kolla_enable_mariadb }}"
+  # Monasca.
+  - src: "{{ kolla_extra_config_path }}/monasca"
+    dest: "{{ kolla_node_custom_config_path }}/monasca"
+    patterns: "*"
+    enabled: "{{ kolla_enable_monasca }}"
   # Murano.
   - src: "{{ kolla_extra_config_path }}/murano"
     dest: "{{ kolla_node_custom_config_path }}/murano"

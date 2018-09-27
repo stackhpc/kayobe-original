@@ -316,9 +316,6 @@ kolla_enable_manila:
 ###############################################################################
 # Monasca configuration.
 
-# NOTE: Support for Monasca in Kolla is a work in progress. This currently
-# relies on an out-of-band Monasca installation.
-
 # Whether to enable Monasca.
 kolla_enable_monasca:
 
@@ -394,6 +391,12 @@ kolla_enable_sahara:
 
 # Free form extra configuration to append to sahara.conf.
 kolla_extra_sahara:
+
+###############################################################################
+# Storm configuration.
+
+# Whether to enable Storm.
+kolla_enable_storm:
 
 ###############################################################################
 # Swift configuration.
