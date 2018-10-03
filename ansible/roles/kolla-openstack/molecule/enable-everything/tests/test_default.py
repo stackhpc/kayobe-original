@@ -65,7 +65,6 @@ def test_service_config_directory(host, path):
      'glance.conf',
      'grafana.ini',
      'heat.conf',
-     'influxdb.conf',
      'ironic.conf',
      'ironic-inspector.conf',
      'kafka.server.properties',
