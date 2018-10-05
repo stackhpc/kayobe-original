@@ -37,7 +37,6 @@ testinfra_hosts = testinfra.utils.ansible_runner.AnsibleRunner(
      'grafana',
      'heat',
      'horizon',
-     'influxdb',
      'ironic',
      'kafka',
      'keystone',
