@@ -40,6 +40,9 @@
     attempts: 1
     timeout: 5400
     required-projects:
+      # Include kayobe to ensure other projects can use this job.
+      - name: openstack/kayobe
+      - name: openstack/kayobe-config-dev
       - name: openstack/kolla
         override-checkout: stable/queens
       - name: openstack/kolla-ansible
@@ -67,6 +70,9 @@
     attempts: 1
     timeout: 5400
     required-projects:
+      # Include kayobe to ensure other projects can use this job.
+      - name: openstack/kayobe
+      - name: openstack/kayobe-config-dev
       - name: openstack/kolla
         override-checkout: stable/queens
       - name: openstack/kolla-ansible
