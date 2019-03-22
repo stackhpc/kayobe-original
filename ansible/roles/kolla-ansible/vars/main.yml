@@ -75,6 +75,7 @@ kolla_feature_flags:
   - barbican
   - blazar
   - cadf_notifications
+  - caso
   - ceilometer
   - ceilometer_ipmi
   - cells
