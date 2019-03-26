@@ -113,13 +113,13 @@ storage
 cinder
 
 [cinder-backup:children]
-storage
+cinder
 
 [cinder-scheduler:children]
 cinder
 
 [cinder-volume:children]
-storage
+cinder
 
 # Cloudkitty
 [cloudkitty-api:children]
