@@ -16,6 +16,7 @@ import subprocess
 import unittest
 
 import mock
+import yaml
 
 from kayobe import utils
 
@@ -48,15 +49,32 @@ class TestCase(unittest.TestCase):
                           utils.galaxy_install, "/path/to/role/file",
                           "/path/to/roles")
 
+    @mock.patch.object(utils, "run_command")
+    def test_galaxy_remove(self, mock_run):
+        utils.galaxy_remove(["role1", "role2"], "/path/to/roles")
+        mock_run.assert_called_once_with(["ansible-galaxy", "remove",
+                                          "--roles-path", "/path/to/roles",
+                                          "role1", "role2"])
+
+    @mock.patch.object(utils, "run_command")
+    def test_galaxy_remove_failure(self, mock_run):
+        mock_run.side_effect = subprocess.CalledProcessError(1, "command")
+        self.assertRaises(SystemExit,
+                          utils.galaxy_install, ["role1", "role2"],
+                          "/path/to/roles")
+
     @mock.patch.object(utils, "read_file")
-    def test_read_yaml_file(self, mock_read):
-        mock_read.return_value = """---
+    @mock.patch.object(yaml, "safe_load", wraps=yaml.safe_load)
+    def test_read_yaml_file(self, mock_load, mock_read):
+        config = """---
 key1: value1
 key2: value2
 """
+        mock_read.return_value = config
         result = utils.read_yaml_file("/path/to/file")
         self.assertEqual(result, {"key1": "value1", "key2": "value2"})
         mock_read.assert_called_once_with("/path/to/file")
+        mock_load.assert_called_once_with(config)
 
     @mock.patch.object(utils, "read_file")
     def test_read_yaml_file_open_failure(self, mock_read):
