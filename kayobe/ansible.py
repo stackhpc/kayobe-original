@@ -85,6 +85,7 @@ def _get_inventory_path(parsed_args):
 
 def _validate_args(parsed_args, playbooks):
     """Validate Kayobe Ansible arguments."""
+    vault.validate_args(parsed_args)
     result = utils.is_readable_dir(parsed_args.config_path)
     if not result["result"]:
         LOG.error("Kayobe configuration path %s is invalid: %s",
@@ -130,7 +131,7 @@ def build_args(parsed_args, playbooks,
         cmd += ["-" + "v" * verbose_level]
     if parsed_args.list_tasks:
         cmd += ["--list-tasks"]
-    cmd += vault.build_args(parsed_args)
+    cmd += vault.build_args(parsed_args, "--vault-password-file")
     inventory = _get_inventory_path(parsed_args)
     cmd += ["--inventory", inventory]
     vars_files = _get_vars_files(parsed_args.config_path)
@@ -158,38 +159,27 @@ def build_args(parsed_args, playbooks,
     return cmd
 
 
-def _read_vault_password_file(vault_password_file):
-    """Return the password from a vault password file."""
-    vault_password = utils.read_file(vault_password_file)
-    vault_password = vault_password.strip()
-    return vault_password
-
-
 def run_playbooks(parsed_args, playbooks,
                   extra_vars=None, limit=None, tags=None, quiet=False,
-                  verbose_level=None, check=None):
+                  check_output=False, verbose_level=None, check=None):
     """Run a Kayobe Ansible playbook."""
     _validate_args(parsed_args, playbooks)
     cmd = build_args(parsed_args, playbooks,
                      extra_vars=extra_vars, limit=limit, tags=tags,
                      verbose_level=verbose_level, check=check)
     env = os.environ.copy()
-    # If the Vault password has been specified via --vault-password-file,
-    # ensure the environment variable is set, so that it can be referenced by
-    # playbooks to generate the kolla-ansible passwords.yml file.
-    if vault.VAULT_PASSWORD_ENV not in env and parsed_args.vault_password_file:
-        vault_password = _read_vault_password_file(
-            parsed_args.vault_password_file)
-        env[vault.VAULT_PASSWORD_ENV] = vault_password
+    vault.update_environment(parsed_args, env)
     # If the configuration path has been specified via --config-path, ensure
     # the environment variable is set, so that it can be referenced by
     # playbooks.
     env.setdefault(CONFIG_PATH_ENV, parsed_args.config_path)
     try:
-        utils.run_command(cmd, quiet=quiet, env=env)
+        utils.run_command(cmd, check_output=check_output, quiet=quiet, env=env)
     except subprocess.CalledProcessError as e:
         LOG.error("Kayobe playbook(s) %s exited %d",
                   ", ".join(playbooks), e.returncode)
+        if check_output:
+            LOG.error("The output was:\n%s", e.output)
         sys.exit(e.returncode)
 
 
@@ -214,7 +204,7 @@ def config_dump(parsed_args, host=None, hosts=None, var_name=None,
         # Don't use check mode for configuration dumps as we won't get any
         # results back.
         run_playbook(parsed_args, "ansible/dump-config.yml",
-                     extra_vars=extra_vars, tags=tags, quiet=True,
+                     extra_vars=extra_vars, tags=tags, check_output=True,
                      verbose_level=verbose_level, check=False)
         hostvars = {}
         for path in os.listdir(dump_dir):
@@ -268,3 +258,19 @@ def install_galaxy_roles(parsed_args, force=False):
 
     # Install roles from kayobe-config.
     utils.galaxy_install(kc_reqs_path, kc_roles_path, force=force)
+
+
+def prune_galaxy_roles(parsed_args):
+    """Prune galaxy roles that are no longer necessary.
+
+    :param parsed_args: Parsed command line arguments.
+    """
+    LOG.info("Removing unnecessary galaxy roles from kayobe")
+    roles_to_remove = [
+        'stackhpc.os-flavors',
+        'stackhpc.os-projects',
+        'stackhpc.parted-1-1',
+        'yatesr.timezone',
+    ]
+    LOG.debug("Removing roles: %s", ",".join(roles_to_remove))
+    utils.galaxy_remove(roles_to_remove, "ansible/roles")

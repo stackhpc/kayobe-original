@@ -28,12 +28,12 @@ from kayobe import utils
 from kayobe import vault
 
 
+@mock.patch.dict(os.environ, clear=True)
 class TestCase(unittest.TestCase):
 
     @mock.patch.object(utils, "run_command")
     @mock.patch.object(ansible, "_get_vars_files")
     @mock.patch.object(ansible, "_validate_args")
-    @mock.patch.dict(os.environ, clear=True)
     def test_run_playbooks(self, mock_validate, mock_vars, mock_run):
         mock_vars.return_value = ["/etc/kayobe/vars-file1.yml",
                                   "/etc/kayobe/vars-file2.yaml"]
@@ -51,14 +51,13 @@ class TestCase(unittest.TestCase):
             "playbook2.yml",
         ]
         expected_env = {"KAYOBE_CONFIG_PATH": "/etc/kayobe"}
-        mock_run.assert_called_once_with(expected_cmd, quiet=False,
-                                         env=expected_env)
+        mock_run.assert_called_once_with(expected_cmd, check_output=False,
+                                         quiet=False, env=expected_env)
         mock_vars.assert_called_once_with("/etc/kayobe")
 
     @mock.patch.object(utils, "run_command")
     @mock.patch.object(ansible, "_get_vars_files")
     @mock.patch.object(ansible, "_validate_args")
-    @mock.patch.dict(os.environ, clear=True)
     def test_run_playbooks_all_the_args(self, mock_validate, mock_vars,
                                         mock_run):
         mock_vars.return_value = ["/path/to/config/vars-file1.yml",
@@ -95,21 +94,22 @@ class TestCase(unittest.TestCase):
             "playbook2.yml",
         ]
         expected_env = {"KAYOBE_CONFIG_PATH": "/path/to/config"}
-        mock_run.assert_called_once_with(expected_cmd, quiet=False,
-                                         env=expected_env)
+        mock_run.assert_called_once_with(expected_cmd, check_output=False,
+                                         quiet=False, env=expected_env)
         mock_vars.assert_called_once_with("/path/to/config")
 
     @mock.patch.object(utils, "run_command")
     @mock.patch.object(ansible, "_get_vars_files")
     @mock.patch.object(ansible, "_validate_args")
-    @mock.patch.dict(os.environ, clear=True)
-    def test_run_playbooks_all_the_long_args(self, mock_validate, mock_vars,
-                                             mock_run):
+    @mock.patch.object(vault, "_ask_vault_pass")
+    def test_run_playbooks_all_the_long_args(self, mock_ask, mock_validate,
+                                             mock_vars, mock_run):
         mock_vars.return_value = ["/path/to/config/vars-file1.yml",
                                   "/path/to/config/vars-file2.yaml"]
         parser = argparse.ArgumentParser()
         ansible.add_args(parser)
         vault.add_args(parser)
+        mock_ask.return_value = "test-pass"
         args = [
             "--ask-vault-pass",
             "--become",
@@ -123,11 +123,12 @@ class TestCase(unittest.TestCase):
             "--list-tasks",
         ]
         parsed_args = parser.parse_args(args)
+        mock_run.return_value = "/path/to/kayobe-vault-password-helper"
         ansible.run_playbooks(parsed_args, ["playbook1.yml", "playbook2.yml"])
         expected_cmd = [
             "ansible-playbook",
             "--list-tasks",
-            "--ask-vault-pass",
+            "--vault-password-file", "/path/to/kayobe-vault-password-helper",
             "--inventory", "/path/to/inventory",
             "-e", "@/path/to/config/vars-file1.yml",
             "-e", "@/path/to/config/vars-file2.yaml",
@@ -140,20 +141,25 @@ class TestCase(unittest.TestCase):
             "playbook1.yml",
             "playbook2.yml",
         ]
-        expected_env = {"KAYOBE_CONFIG_PATH": "/path/to/config"}
-        mock_run.assert_called_once_with(expected_cmd, quiet=False,
-                                         env=expected_env)
+        expected_env = {"KAYOBE_CONFIG_PATH": "/path/to/config",
+                        "KAYOBE_VAULT_PASSWORD": "test-pass"}
+        expected_calls = [
+            mock.call(["which", "kayobe-vault-password-helper"],
+                      check_output=True),
+            mock.call(expected_cmd, check_output=False, quiet=False,
+                      env=expected_env)
+        ]
+        self.assertEqual(expected_calls, mock_run.mock_calls)
         mock_vars.assert_called_once_with("/path/to/config")
 
     @mock.patch.object(utils, "run_command")
     @mock.patch.object(ansible, "_get_vars_files")
     @mock.patch.object(ansible, "_validate_args")
-    @mock.patch.object(ansible, "_read_vault_password_file")
-    @mock.patch.dict(os.environ, clear=True)
-    def test_run_playbooks_vault_password_file(self, mock_read, mock_validate,
+    @mock.patch.object(vault, "update_environment")
+    def test_run_playbooks_vault_password_file(self, mock_update,
+                                               mock_validate,
                                                mock_vars, mock_run):
         mock_vars.return_value = []
-        mock_read.return_value = "test-pass"
         parser = argparse.ArgumentParser()
         ansible.add_args(parser)
         vault.add_args(parser)
@@ -168,10 +174,10 @@ class TestCase(unittest.TestCase):
             "--inventory", "/etc/kayobe/inventory",
             "playbook1.yml",
         ]
-        expected_env = {"KAYOBE_CONFIG_PATH": "/etc/kayobe",
-                        "KAYOBE_VAULT_PASSWORD": "test-pass"}
-        mock_run.assert_called_once_with(expected_cmd, quiet=False,
-                                         env=expected_env)
+        expected_env = {"KAYOBE_CONFIG_PATH": "/etc/kayobe"}
+        mock_run.assert_called_once_with(expected_cmd, check_output=False,
+                                         quiet=False, env=expected_env)
+        mock_update.assert_called_once_with(mock.ANY, expected_env)
 
     @mock.patch.dict(os.environ, {"KAYOBE_VAULT_PASSWORD": "test-pass"},
                      clear=True)
@@ -198,13 +204,12 @@ class TestCase(unittest.TestCase):
         ]
         expected_env = {"KAYOBE_CONFIG_PATH": "/etc/kayobe",
                         "KAYOBE_VAULT_PASSWORD": "test-pass"}
-        mock_run.assert_called_once_with(expected_cmd, quiet=False,
-                                         env=expected_env)
+        mock_run.assert_called_once_with(expected_cmd, check_output=False,
+                                         quiet=False, env=expected_env)
 
     @mock.patch.object(utils, "run_command")
     @mock.patch.object(ansible, "_get_vars_files")
     @mock.patch.object(ansible, "_validate_args")
-    @mock.patch.dict(os.environ, clear=True)
     def test_run_playbooks_vault_ask_and_file(self, mock_validate, mock_vars,
                                               mock_run):
         mock_vars.return_value = []
@@ -237,7 +242,7 @@ class TestCase(unittest.TestCase):
         ]
         expected_env = {"KAYOBE_CONFIG_PATH": "/path/to/config"}
         mock_run.assert_called_once_with(expected_cmd, quiet=False,
-                                         env=expected_env)
+                                         env=expected_env, check_output=False)
         mock_vars.assert_called_once_with("/path/to/config")
 
     @mock.patch.object(utils, "run_command")
@@ -262,7 +267,7 @@ class TestCase(unittest.TestCase):
         expected_env = {"KAYOBE_CONFIG_PATH": "/etc/kayobe",
                         "KAYOBE_INVENTORY_PATH": "/path/to/inventory"}
         mock_run.assert_called_once_with(expected_cmd, quiet=False,
-                                         env=expected_env)
+                                         env=expected_env, check_output=False)
         mock_vars.assert_called_once_with("/etc/kayobe")
 
     @mock.patch.object(utils, "run_command")
@@ -304,14 +309,13 @@ class TestCase(unittest.TestCase):
             "playbook2.yml",
         ]
         expected_env = {"KAYOBE_CONFIG_PATH": "/etc/kayobe"}
-        mock_run.assert_called_once_with(expected_cmd, quiet=False,
-                                         env=expected_env)
+        mock_run.assert_called_once_with(expected_cmd, check_output=False,
+                                         quiet=False, env=expected_env)
         mock_vars.assert_called_once_with("/etc/kayobe")
 
     @mock.patch.object(utils, "run_command")
     @mock.patch.object(ansible, "_get_vars_files")
     @mock.patch.object(ansible, "_validate_args")
-    @mock.patch.dict(os.environ, clear=True)
     def test_run_playbooks_failure(self, mock_validate, mock_vars, mock_run):
         parser = argparse.ArgumentParser()
         ansible.add_args(parser)
@@ -330,7 +334,8 @@ class TestCase(unittest.TestCase):
                          mock_rmtree):
         parser = argparse.ArgumentParser()
         parsed_args = parser.parse_args([])
-        dump_dir = mock_mkdtemp.return_value
+        dump_dir = "/path/to/dump"
+        mock_mkdtemp.return_value = dump_dir
         mock_listdir.return_value = ["host1.yml", "host2.yml"]
         mock_read.side_effect = [
             {"var1": "value1"},
@@ -347,7 +352,7 @@ class TestCase(unittest.TestCase):
                                          extra_vars={
                                              "dump_path": dump_dir,
                                          },
-                                         quiet=True, tags=None,
+                                         check_output=True, tags=None,
                                          verbose_level=None, check=False)
         mock_rmtree.assert_called_once_with(dump_dir)
         mock_listdir.assert_called_once_with(dump_dir)
@@ -436,9 +441,19 @@ class TestCase(unittest.TestCase):
             "/etc/kayobe/ansible/requirements.yml")
         mock_mkdirs.assert_called_once_with("/etc/kayobe/ansible/roles")
 
-    @mock.patch.object(utils, 'read_file')
-    def test__read_vault_password_file(self, mock_read):
-        mock_read.return_value = "test-pass\n"
-        result = ansible._read_vault_password_file("/path/to/file")
-        self.assertEqual("test-pass", result)
-        mock_read.assert_called_once_with("/path/to/file")
+    @mock.patch.object(utils, 'galaxy_remove', autospec=True)
+    def test_prune_galaxy_roles(self, mock_remove):
+        parser = argparse.ArgumentParser()
+        ansible.add_args(parser)
+        parsed_args = parser.parse_args([])
+
+        ansible.prune_galaxy_roles(parsed_args)
+
+        expected_roles = [
+            'stackhpc.os-flavors',
+            'stackhpc.os-projects',
+            'stackhpc.parted-1-1',
+            'yatesr.timezone',
+        ]
+        mock_remove.assert_called_once_with(expected_roles,
+                                            "ansible/roles")
