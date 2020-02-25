@@ -894,6 +894,10 @@ class TestCase(unittest.TestCase):
         expected_calls = [
             mock.call(
                 mock.ANY,
+                [utils.get_data_files_path("ansible", "seed-deploy-containers.yml")],  # noqa
+            ),
+            mock.call(
+                mock.ANY,
                 [utils.get_data_files_path("ansible", "kolla-ansible.yml")],
                 tags="config",
                 ignore_limit=True,
@@ -940,6 +944,10 @@ class TestCase(unittest.TestCase):
         self.assertEqual(0, result)
 
         expected_calls = [
+            mock.call(
+                mock.ANY,
+                [utils.get_data_files_path("ansible", "seed-deploy-containers.yml")],  # noqa
+            ),
             mock.call(
                 mock.ANY,
                 [utils.get_data_files_path("ansible", "kolla-ansible.yml")],
