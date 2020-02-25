@@ -185,6 +185,14 @@ To deploy the seed services in containers::
 
 After this command has completed the seed services will be active.
 
+.. seealso::
+
+   Information on configuration of Kolla Ansible is available :ref:`here
+   <configuration-kolla-ansible>`. See :ref:`here <configuration-bifrost>` for
+   information about configuring Bifrost.
+   :ref:`configuration-bifrost-overcloud-root-image` provides information on
+   configuring the root disk image build process.
+
 Building Deployment Images
 --------------------------
 
