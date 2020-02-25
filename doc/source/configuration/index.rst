@@ -11,3 +11,4 @@ Configuration Guide
    hosts
    kolla
    kolla-ansible
+   user-defined-containers
