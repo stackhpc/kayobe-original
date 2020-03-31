@@ -257,7 +257,8 @@ class PlaybookRun(KayobeAnsibleMixin, VaultMixin, Command):
         self.run_kayobe_playbooks(parsed_args, parsed_args.playbook)
 
 
-class KollaAnsibleRun(KollaAnsibleMixin, VaultMixin, Command):
+class KollaAnsibleRun(KollaAnsibleMixin, KayobeAnsibleMixin, VaultMixin,
+                      Command):
     """Run a Kolla Ansible command.
 
     Allows a single kolla-ansible command to be run. For advanced users only.
@@ -1044,7 +1045,8 @@ class OvercloudHostUpgrade(KayobeAnsibleMixin, VaultMixin, Command):
         self.run_kayobe_playbooks(parsed_args, playbooks, limit="overcloud")
 
 
-class OvercloudDatabaseBackup(KollaAnsibleMixin, VaultMixin, Command):
+class OvercloudDatabaseBackup(KollaAnsibleMixin, KayobeAnsibleMixin,
+                              VaultMixin, Command):
     """Backup the overcloud database."""
 
     def get_parser(self, prog_name):
@@ -1064,7 +1066,8 @@ class OvercloudDatabaseBackup(KollaAnsibleMixin, VaultMixin, Command):
                                          extra_args=extra_args)
 
 
-class OvercloudDatabaseRecover(KollaAnsibleMixin, VaultMixin, Command):
+class OvercloudDatabaseRecover(KollaAnsibleMixin, KayobeAnsibleMixin,
+                               VaultMixin, Command):
     """Recover the overcloud database."""
 
     def get_parser(self, prog_name):
