@@ -27,8 +27,9 @@
   version: v1.3.0
 - src: stackhpc.libvirt-vm
   version: v1.6.0
-- src: stackhpc.luks
-  version: 0.2.0
+- name: stackhpc.luks
+  src: "git+https://github.com/stackhpc/ansible-role-luks"
+  version: feature/tang
 - src: stackhpc.mellanox-switch
   version: v1.0.0
 - src: stackhpc.os-images
