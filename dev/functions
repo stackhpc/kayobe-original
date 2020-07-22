@@ -41,6 +41,21 @@ function config_defaults {
     # Additional arguments to pass to kayobe commands.
     export KAYOBE_EXTRA_ARGS=${KAYOBE_EXTRA_ARGS:-}
 
+    # Use .gitreview as the key to determine the appropriate branch to clone
+    # for tests. Inspired by OSA code.
+    PARENT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    if [ -f "${PARENT}/../.gitreview" ]; then
+      BRANCH=$(awk -F'=' '/defaultbranch/ {print $2}' "${PARENT}/../.gitreview")
+      if [[ "${BRANCH}" == "" ]]; then
+        SERIES="master"
+      else
+        SERIES="$(echo ${BRANCH} | sed 's|stable/||')"
+      fi
+
+      # Upper constraints to use when installing Python packages.
+      export UPPER_CONSTRAINTS_FILE="${UPPER_CONSTRAINTS_FILE:-https://releases.openstack.org/constraints/upper/${SERIES}}"
+    fi
+
     # Path to the Tenks virtual environment.
     export TENKS_VENV_PATH="${TENKS_VENV_PATH:-${HOME}/tenks-test-venv}"
 
@@ -85,9 +100,9 @@ function config_init {
 function install_dependencies {
     echo "Installing package dependencies for kayobe"
     if [[ -e /etc/centos-release ]]; then
-        sudo yum -y install gcc git vim python-virtualenv
+        sudo yum -y install gcc git vim python-six python-virtualenv
     else
-        sudo apt install -y python-dev python-virtualenv gcc git
+        sudo apt install -y python-dev python-six python-virtualenv gcc git
     fi
 }
 
@@ -129,7 +144,9 @@ function install_kayobe_dev_venv {
 
 function upgrade_kayobe_venv {
     echo "Upgrading kayobe virtual environment in ${KAYOBE_VENV_PATH}"
-    virtualenv "${KAYOBE_VENV_PATH}"
+    if [[ ! -e "${KAYOBE_VENV_PATH}" ]]; then
+        virtualenv "${KAYOBE_VENV_PATH}"
+    fi
     # NOTE: Virtualenv's activate and deactivate scripts reference an
     # unbound variable.
     set +u
@@ -369,7 +386,12 @@ function overcloud_test_init {
     echo "Performing overcloud test init"
     environment_setup
 
-    pip install python-openstackclient
+    # Constraint with ${KAYOBE_SOURCE_PATH}/requirements.txt to ensure kayobe CLI doesn't get broken
+    if [[ ! -z "$UPPER_CONSTRAINTS_FILE" ]]; then
+        pip install python-openstackclient -c "${KAYOBE_SOURCE_PATH}/requirements.txt" -c "$UPPER_CONSTRAINTS_FILE"
+    else
+        pip install python-openstackclient -c "${KAYOBE_SOURCE_PATH}/requirements.txt"
+    fi
     source "${KOLLA_CONFIG_PATH:-/etc/kolla}/admin-openrc.sh"
 
     # This guards init-runonce from running more than once
@@ -489,7 +511,7 @@ function tenks_deploy {
     deactivate
 
     # Install the Tenks venv.
-    install_venv "${TENKS_VENV_PATH}" "$tenks_path"
+    install_venv "${TENKS_VENV_PATH}" "$tenks_path" -c "$UPPER_CONSTRAINTS_FILE"
     source ${TENKS_VENV_PATH:-$HOME/tenks-test-venv}/bin/activate
 
     ${KAYOBE_SOURCE_PATH}/tools/ansible-galaxy-retried.sh install \
