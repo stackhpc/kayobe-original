@@ -3,9 +3,14 @@
   hosts: seed-hypervisor:seed:overcloud
   tags:
     - yum
-  roles:
-    - role: yum
-
-    - role: yum-cron
-      tags:
-        - yum-cron
+  tasks:
+    - block:
+        - import_role:
+            name: yum
+        - import_role:
+            name: yum-cron
+          tags:
+            - yum-cron
+      when:
+        - ansible_os_family == 'RedHat'
+        - ansible_distribution_major_version | int == 7

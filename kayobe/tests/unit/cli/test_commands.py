@@ -322,6 +322,7 @@ class TestCase(unittest.TestCase):
                         "ansible", "kayobe-target-venv.yml"),
                     utils.get_data_files_path("ansible", "users.yml"),
                     utils.get_data_files_path("ansible", "yum.yml"),
+                    utils.get_data_files_path("ansible", "dnf.yml"),
                     utils.get_data_files_path("ansible", "dev-tools.yml"),
                     utils.get_data_files_path("ansible", "network.yml"),
                     utils.get_data_files_path("ansible", "sysctl.yml"),
@@ -499,6 +500,7 @@ class TestCase(unittest.TestCase):
                         "ansible", "kayobe-target-venv.yml"),
                     utils.get_data_files_path("ansible", "users.yml"),
                     utils.get_data_files_path("ansible", "yum.yml"),
+                    utils.get_data_files_path("ansible", "dnf.yml"),
                     utils.get_data_files_path("ansible", "dev-tools.yml"),
                     utils.get_data_files_path(
                         "ansible", "disable-selinux.yml"),
@@ -1126,6 +1128,7 @@ class TestCase(unittest.TestCase):
                         "ansible", "kayobe-target-venv.yml"),
                     utils.get_data_files_path("ansible", "users.yml"),
                     utils.get_data_files_path("ansible", "yum.yml"),
+                    utils.get_data_files_path("ansible", "dnf.yml"),
                     utils.get_data_files_path("ansible", "dev-tools.yml"),
                     utils.get_data_files_path(
                         "ansible", "disable-selinux.yml"),
@@ -1679,6 +1682,70 @@ class TestCase(unittest.TestCase):
             ),
         ]
         self.assertEqual(expected_calls, mock_kolla_run.call_args_list)
+
+    @mock.patch.object(commands.KayobeAnsibleMixin,
+                       "run_kayobe_playbooks")
+    @mock.patch.object(commands.KollaAnsibleMixin,
+                       "run_kolla_ansible_overcloud")
+    def test_overcloud_service_stop(self, mock_kolla_run, mock_run):
+        command = commands.OvercloudServiceStop(TestApp(), [])
+        parser = command.get_parser("test")
+        parsed_args = parser.parse_args(["--yes-i-really-really-mean-it"])
+
+        result = command.run(parsed_args)
+        self.assertEqual(0, result)
+
+        expected_calls = [
+            mock.call(
+                mock.ANY,
+                [utils.get_data_files_path("ansible", "kolla-ansible.yml")],
+                ignore_limit=True,
+                tags="config",
+            ),
+            mock.call(
+                mock.ANY,
+                [
+                    utils.get_data_files_path("ansible",
+                                              "kolla-openstack.yml"),
+                ],
+                ignore_limit=True,
+            ),
+            mock.call(
+                mock.ANY,
+                [
+                    utils.get_data_files_path("ansible",
+                                              "overcloud-extras.yml"),
+                ],
+                limit="overcloud",
+                extra_vars={
+                    "kayobe_action": "stop",
+                },
+            ),
+        ]
+        self.assertEqual(expected_calls, mock_run.call_args_list)
+
+        expected_calls = [
+            mock.call(
+                mock.ANY,
+                "stop",
+                extra_args=["--yes-i-really-really-mean-it"],
+            ),
+        ]
+        self.assertEqual(expected_calls, mock_kolla_run.call_args_list)
+
+    @mock.patch.object(commands.KayobeAnsibleMixin,
+                       "run_kayobe_playbooks")
+    @mock.patch.object(commands.KollaAnsibleMixin,
+                       "run_kolla_ansible_overcloud")
+    def test_overcloud_service_stop_no_disclaimer(self, mock_kolla_run,
+                                                  mock_run):
+        command = commands.OvercloudServiceStop(TestApp(), [])
+        parser = command.get_parser("test")
+        parsed_args = parser.parse_args([])
+
+        self.assertRaises(
+            SystemExit,
+            command.run, parsed_args)
 
     @mock.patch.object(commands.KayobeAnsibleMixin,
                        "run_kayobe_playbooks")

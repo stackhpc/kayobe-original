@@ -17,17 +17,12 @@
         - not ansible_python_interpreter.startswith('/usr/bin')
 
     - block:
-        # This will cause ansible to use the system python interpreter.
-        - name: Deactivate the virtualenv
-          include_role:
-            name: deactivate-virtualenv
-
         - name: Gather facts
           setup:
 
-        - name: Ensure the python-virtualenv package is installed
+        - name: Ensure the Python virtualenv package is installed
           package:
-            name: python-virtualenv
+            name: python{{ ansible_python.version.major }}-virtualenv
             state: present
           become: True
 
@@ -57,6 +52,9 @@
             name: pip
             virtualenv: "{{ virtualenv }}"
             virtualenv_site_packages: True
+          when:
+            - ansible_os_family == 'RedHat'
+            - ansible_distribution_major_version | int == 7
 
         - name: Ensure kayobe virtualenv has the latest version of pip installed
           pip:
@@ -66,18 +64,32 @@
             # Site packages are required for using the yum and selinux python
             # modules, which are not available via PyPI.
             virtualenv_site_packages: True
+            virtualenv_python: "python{{ ansible_python.version.major }}.{{ ansible_python.version.minor }}"
 
-        - name: Activate the virtualenv
-          include_role:
-            name: activate-virtualenv
-          vars:
-            activate_virtualenv_path: "{{ virtualenv }}"
+        # NOTE(mgoddard): SELinux python bindings available on PyPI only work
+        # with Python 3 on CentOS 8.
+        - name: Ensure kayobe virtualenv has SELinux bindings installed
+          pip:
+            name: selinux
+            state: latest
+            virtualenv: "{{ virtualenv }}"
+          when:
+            - ansible_os_family == 'RedHat'
+            - ansible_distribution_major_version | int >= 8
+      vars:
+        # Use the system python interpreter since the virtualenv might not
+        # exist.
+        ansible_python_interpreter: /usr/libexec/platform-python
       when: virtualenv is defined
 
     - block:
-        - name: Ensure the python-setuptools package is installed
+        - name: Ensure Python setuptools and pip packages are installed
+          vars:
+            packages:
+              - python{{ ansible_python.version.major }}-setuptools
+              - "{% if ansible_distribution_major_version | int >= 8 %}python3-pip{% endif %}"
           package:
-            name: python-setuptools
+            name: "{{ packages | select }}"
             state: present
           become: True
 
@@ -85,4 +97,7 @@
           easy_install:
             name: pip
           become: True
+          when:
+            - ansible_os_family == 'RedHat'
+            - ansible_distribution_major_version | int == 7
       when: virtualenv is not defined

@@ -35,11 +35,36 @@ function config_defaults {
     export KAYOBE_SEED_CONTAINER_IMAGE_BUILD=${KAYOBE_SEED_CONTAINER_IMAGE_BUILD:-0}
 
     # Whether to build container images for the overcloud services. If 0, they
-    # will be pulled.
+    # will be pulled if $KAYOBE_OVERCLOUD_CONTAINER_IMAGE_PULL is 1.
     export KAYOBE_OVERCLOUD_CONTAINER_IMAGE_BUILD=${KAYOBE_OVERCLOUD_CONTAINER_IMAGE_BUILD:-0}
+
+    # Whether to pull container images for the overcloud services if
+    # $KAYOBE_OVERCLOUD_CONTAINER_IMAGE_BUILD is 0.
+    export KAYOBE_OVERCLOUD_CONTAINER_IMAGE_PULL=${KAYOBE_OVERCLOUD_CONTAINER_IMAGE_PULL:-1}
+
+    # Whether to deploy overcloud services.
+    export KAYOBE_OVERCLOUD_SERVICE_DEPLOY=${KAYOBE_OVERCLOUD_SERVICE_DEPLOY:-1}
+
+    # Whether to perform overcloud post configuration.
+    export KAYOBE_OVERCLOUD_POST_CONFIGURE=${KAYOBE_OVERCLOUD_POST_CONFIGURE:-1}
 
     # Additional arguments to pass to kayobe commands.
     export KAYOBE_EXTRA_ARGS=${KAYOBE_EXTRA_ARGS:-}
+
+    # Use .gitreview as the key to determine the appropriate branch to clone
+    # for tests. Inspired by OSA code.
+    PARENT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    if [ -f "${PARENT}/../.gitreview" ]; then
+      BRANCH=$(awk -F'=' '/defaultbranch/ {print $2}' "${PARENT}/../.gitreview")
+      if [[ "${BRANCH}" == "" ]]; then
+        SERIES="master"
+      else
+        SERIES="$(echo ${BRANCH} | sed 's|stable/||')"
+      fi
+
+      # Upper constraints to use when installing Python packages.
+      export UPPER_CONSTRAINTS_FILE="${UPPER_CONSTRAINTS_FILE:-https://releases.openstack.org/constraints/upper/${SERIES}}"
+    fi
 
     # Path to the Tenks virtual environment.
     export TENKS_VENV_PATH="${TENKS_VENV_PATH:-${HOME}/tenks-test-venv}"
@@ -82,12 +107,41 @@ function config_init {
 
 # Installation
 
+function is_dnf {
+    if [[ -e /etc/centos-release ]]; then
+        which dnf >/dev/null 2>&1
+    else
+        return 1
+    fi
+}
+
+function is_yum {
+    if [[ -e /etc/centos-release ]]; then
+        which yum >/dev/null 2>&1
+    else
+        return 1
+    fi
+}
+
+function python_version {
+    # Echo python major version.
+    if is_dnf; then
+        echo 3
+    elif is_yum; then
+        echo 2
+    else
+        echo 3
+    fi
+}
+
 function install_dependencies {
     echo "Installing package dependencies for kayobe"
-    if [[ -e /etc/centos-release ]]; then
-        sudo yum -y install gcc git vim python-virtualenv libffi-devel
+    if is_dnf; then
+        sudo dnf -y install gcc git vim python3-pyyaml python3-virtualenv libffi-devel
+    elif is_yum; then
+        sudo yum -y install gcc git vim python2-virtualenv libffi-devel
     else
-        sudo apt install -y python-dev python-virtualenv gcc git libffi-dev
+        sudo apt install -y python-dev python3-virtualenv gcc git libffi-dev
     fi
 }
 
@@ -103,7 +157,7 @@ function install_venv {
     fi
     if [[ ! -f "${venv_path}/bin/activate" ]]; then
         echo "Creating virtual environment in ${venv_path}"
-        virtualenv "${venv_path}"
+        virtualenv -p python$(python_version) "${venv_path}"
         # NOTE: Virtualenv's activate and deactivate scripts reference an
         # unbound variable.
         set +u
@@ -129,7 +183,7 @@ function install_kayobe_dev_venv {
 
 function upgrade_kayobe_venv {
     echo "Upgrading kayobe virtual environment in ${KAYOBE_VENV_PATH}"
-    virtualenv "${KAYOBE_VENV_PATH}"
+    virtualenv -p python$(python_version) "${KAYOBE_VENV_PATH}"
     # NOTE: Virtualenv's activate and deactivate scripts reference an
     # unbound variable.
     set +u
@@ -302,17 +356,21 @@ function overcloud_deploy {
     if [[ ${KAYOBE_OVERCLOUD_CONTAINER_IMAGE_BUILD} = 1 ]]; then
         echo "Building overcloud container images"
         run_kayobe overcloud container image build
-    else
+    elif [[ ${KAYOBE_OVERCLOUD_CONTAINER_IMAGE_PULL} = 1 ]]; then
         echo "Pulling overcloud container images"
         run_kayobe overcloud container image pull
     fi
 
-    echo "Deploying containerised overcloud services"
-    run_kayobe overcloud service deploy
+    if [[ ${KAYOBE_OVERCLOUD_SERVICE_DEPLOY} = 1 ]]; then
+        echo "Deploying containerised overcloud services"
+        run_kayobe overcloud service deploy
+    fi
 
-    echo "Performing post-deployment configuration"
-    source "${KOLLA_CONFIG_PATH:-/etc/kolla}/admin-openrc.sh"
-    run_kayobe overcloud post configure
+    if [[ ${KAYOBE_OVERCLOUD_POST_CONFIGURE} = 1 ]]; then
+        echo "Performing post-deployment configuration"
+        source "${KOLLA_CONFIG_PATH:-/etc/kolla}/admin-openrc.sh"
+        run_kayobe overcloud post configure
+    fi
 
     echo "Control plane deployment complete"
 }
@@ -363,7 +421,12 @@ function overcloud_test_init {
     echo "Performing overcloud test init"
     environment_setup
 
-    pip install python-openstackclient
+    # Constraint with ${KAYOBE_SOURCE_PATH}/requirements.txt to ensure kayobe CLI doesn't get broken
+    if [[ ! -z "$UPPER_CONSTRAINTS_FILE" ]]; then
+        pip install python-openstackclient -c "${KAYOBE_SOURCE_PATH}/requirements.txt" -c "$UPPER_CONSTRAINTS_FILE"
+    else
+        pip install python-openstackclient -c "${KAYOBE_SOURCE_PATH}/requirements.txt"
+    fi
     source "${KOLLA_CONFIG_PATH:-/etc/kolla}/admin-openrc.sh"
 
     # This guards init-runonce from running more than once
@@ -374,6 +437,11 @@ function overcloud_test_init {
         export ENABLE_EXT_NET=0
         ${KOLLA_VENV_PATH:-$HOME/kolla-venv}/share/kolla-ansible/init-runonce
         unset ENABLE_EXT_NET
+
+        # Allow provision-net to be used as an external network for floating IPs.
+        # Note: a provisioning network would not normally be external.
+        openstack network set provision-net --external
+        openstack router set demo-router --external-gateway provision-net
     else
         echo "Not running kolla-ansible init-runonce - resources exist"
     fi
@@ -487,7 +555,7 @@ function tenks_deploy {
     deactivate
 
     # Install the Tenks venv.
-    install_venv "${TENKS_VENV_PATH}" "$tenks_path"
+    install_venv "${TENKS_VENV_PATH}" "$tenks_path" -c "$UPPER_CONSTRAINTS_FILE"
     source ${TENKS_VENV_PATH:-$HOME/tenks-test-venv}/bin/activate
 
     ${KAYOBE_SOURCE_PATH}/tools/ansible-galaxy-retried.sh install \

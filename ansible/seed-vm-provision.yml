@@ -3,7 +3,6 @@
   hosts: seed-hypervisor
   vars:
     seed_host: "{{ groups['seed'][0] }}"
-    seed_user_data_path: "{{ image_cache_path }}/seed-vm-user-data"
   pre_tasks:
     - name: Verify the seed host exists in the Ansible inventory
       fail:
@@ -12,6 +11,17 @@
           currently {{ groups['seed'] | length }}.
       when: groups['seed'] | length != 1
 
+    # NOTE(priteau): On seed hypervisors running CentOS 8, the configdrive role
+    # will fail to install coreutils if coreutils-single is already present.
+    # Until the role handles it, install it using the --allowerasing option
+    # which will remove coreutils-single.
+    - name: Ensure coreutils package is installed
+      command: "dnf install coreutils -y --allowerasing"
+      become: True
+      when:
+        - ansible_os_family == 'RedHat'
+        - ansible_distribution_major_version | int >= 8
+
     - name: Ensure the image cache directory exists
       file:
         path: "{{ image_cache_path }}"
@@ -19,6 +29,12 @@
         owner: "{{ ansible_user_uid }}"
         group: "{{ ansible_user_gid }}"
       become: True
+
+    - name: Create a temporary user data file locally
+      tempfile:
+        state: file
+      register: seed_user_data_file
+      delegate_to: localhost
 
     # The user data script is used to bring up the network interfaces that will
     # be configured by metadata in the configdrive. For some reason resolv.conf
@@ -34,7 +50,8 @@
           {% endfor %}
           # Fix permissions of resolv.conf.
           chmod 644 /etc/resolv.conf
-        dest: "{{ seed_user_data_path }}"
+        dest: "{{ seed_user_data_file.path }}"
+      delegate_to: localhost
 
   roles:
     - role: jriguera.configdrive
@@ -55,7 +72,7 @@
         {{ hostvars[seed_host].network_interfaces |
            map('net_configdrive_network_device', seed_host) |
            list }}
-      configdrive_config_user_data_path: "{{ seed_user_data_path }}"
+      configdrive_config_user_data_path: "{{ seed_user_data_file.path }}"
 
   tasks:
     - name: Set a fact containing the configdrive image path
@@ -73,8 +90,15 @@
         path: "{{ item }}"
         state: absent
       with_items:
-        - "{{ seed_user_data_path }}"
         - "{{ image_cache_path }}/{{ seed_host | to_uuid }}.gz"
+
+    - name: Ensure unnecessary local files are removed
+      file:
+        path: "{{ item }}"
+        state: absent
+      with_items:
+        - "{{ seed_user_data_file.path }}"
+      delegate_to: localhost
 
 - name: Ensure that the seed VM is provisioned
   hosts: seed-hypervisor

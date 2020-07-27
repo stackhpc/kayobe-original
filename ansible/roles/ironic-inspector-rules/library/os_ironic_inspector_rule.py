@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 # Copyright (c) 2017 StackHPC Ltd.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -12,7 +14,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-#!/usr/bin/python
+import copy
 
 from ansible.module_utils.basic import *
 from ansible.module_utils.openstack import *
@@ -24,7 +26,7 @@ try:
 except Exception as e:
     IMPORT_ERRORS.append(e)
 try:
-    import shade
+    import openstack
 except Exception as e:
     IMPORT_ERRORS.append(e)
 
@@ -76,17 +78,15 @@ os_ironic_inspector_rule:
 """
 
 
-def _build_client(module):
+def _build_client(module, cloud):
     """Create and return an Ironic inspector client."""
-    cloud = shade.operator_cloud(**module.params)
-    session = cloud.cloud_config.get_session()
     # Ensure the requested API version is supported.
     # API 1.14 is the latest API version available in Rocky.
     api_version = (1, 14)
     client = ironic_inspector_client.v1.ClientV1(
         inspector_url=module.params['inspector_url'],
         interface=module.params['interface'],
-        session=session, region_name=module.params['region_name'],
+        session=cloud.session, region_name=module.params['region_name'],
         api_version=api_version)
     return client
 
@@ -104,7 +104,16 @@ def _ensure_rule_present(module, client):
             # Check whether the rule differs from the request.
             keys = ('conditions', 'actions', 'description')
             for key in keys:
-                if rule[key] != module.params[key]:
+                expected = module.params[key]
+                if key == 'conditions':
+                    # Rules returned from the API include default values in the
+                    # conditions that may not be in the requested rule. Apply
+                    # defaults to allow the comparison to succeed.
+                    expected = copy.deepcopy(expected)
+                    for condition in expected:
+                        condition.setdefault('invert', False)
+                        condition.setdefault('multiple', 'any')
+                if rule[key] != expected:
                     break
             else:
                 # Nothing to do - rule exists and is as requested.
@@ -161,8 +170,9 @@ def main():
             endpoint=module.params['inspector_url']
         )
 
+    sdk, cloud = openstack_cloud_from_module(module)
     try:
-        client = _build_client(module)
+        client = _build_client(module, cloud)
         if module.params["state"] == "present":
             changed = _ensure_rule_present(module, client)
         else:

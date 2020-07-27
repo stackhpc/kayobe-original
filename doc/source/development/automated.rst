@@ -137,11 +137,16 @@ Run the ``dev/tenks-deploy-compute.sh`` script to deploy Tenks::
 
 Check that Tenks has created VMs called ``tk0`` and ``tk1``::
 
-    sudo virsh list --all
+    sudo virsh -c qemu+unix:///system?socket=/var/run/libvirt-tenks/libvirt-sock list --all
 
 Verify that VirtualBMC is running::
 
     ~/tenks-venv/bin/vbmc list
+
+Configure the firewall to allow the baremetal nodes to access OpenStack
+services::
+
+    ./dev/configure-firewall.sh
 
 We are now ready to run the ``dev/overcloud-test-baremetal.sh`` script. This
 will run the ``init-runonce`` setup script provided by Kolla Ansible that

@@ -377,8 +377,8 @@ class SeedHypervisorHostConfigure(KollaAnsibleMixin, KayobeAnsibleMixin,
         if parsed_args.wipe_disks:
             playbooks += _build_playbook_list("wipe-disks")
         playbooks += _build_playbook_list(
-            "users", "yum", "dev-tools", "network", "sysctl", "ntp", "mdadm",
-            "lvm", "seed-hypervisor-libvirt-host")
+            "users", "yum", "dnf", "dev-tools", "network", "sysctl", "ntp",
+            "mdadm", "lvm", "seed-hypervisor-libvirt-host")
         self.run_kayobe_playbooks(parsed_args, playbooks,
                                   limit="seed-hypervisor")
 
@@ -544,7 +544,7 @@ class SeedHostConfigure(KollaAnsibleMixin, KayobeAnsibleMixin, VaultMixin,
         if parsed_args.wipe_disks:
             playbooks += _build_playbook_list("wipe-disks")
         playbooks += _build_playbook_list(
-            "users", "yum", "dev-tools", "disable-selinux", "network",
+            "users", "yum", "dnf", "dev-tools", "disable-selinux", "network",
             "sysctl", "ip-routing", "snat", "disable-glean", "ntp", "mdadm",
             "lvm", "docker-devicemapper")
         self.run_kayobe_playbooks(parsed_args, playbooks, limit="seed")
@@ -944,7 +944,7 @@ class OvercloudHostConfigure(KollaAnsibleMixin, KayobeAnsibleMixin, VaultMixin,
         if parsed_args.wipe_disks:
             playbooks += _build_playbook_list("wipe-disks")
         playbooks += _build_playbook_list(
-            "users", "yum", "dev-tools", "disable-selinux", "network",
+            "users", "yum", "dnf", "dev-tools", "disable-selinux", "network",
             "sysctl", "disable-glean", "disable-cloud-init", "ntp", "mdadm",
             "lvm", "docker-devicemapper")
         self.run_kayobe_playbooks(parsed_args, playbooks, limit="overcloud")
@@ -1311,6 +1311,52 @@ class OvercloudServiceReconfigure(KollaAnsibleMixin, KayobeAnsibleMixin,
         # user.
         playbooks = _build_playbook_list("public-openrc")
         self.run_kayobe_playbooks(parsed_args, playbooks, ignore_limit=True)
+
+
+class OvercloudServiceStop(KollaAnsibleMixin, KayobeAnsibleMixin, VaultMixin,
+                           Command):
+    """Stop the overcloud services.
+
+    * Configure kolla-ansible.
+    * Configure overcloud services in kolla-ansible.
+    * Perform a kolla-ansible stop of the overcloud services.
+    * Stop kayobe extra services.
+
+    This can be used in conjunction with the --tags and --kolla-tags arguments
+    to stop specific services.
+    """
+
+    def get_parser(self, prog_name):
+        parser = super(OvercloudServiceStop, self).get_parser(prog_name)
+        group = parser.add_argument_group("Services")
+        group.add_argument("--yes-i-really-really-mean-it",
+                           action='store_true',
+                           help="confirm that you understand that this will "
+                                "stop running services.")
+        return parser
+
+    def take_action(self, parsed_args):
+        if not parsed_args.yes_i_really_really_mean_it:
+            self.app.LOG.error("This will stop running services. Specify "
+                               "--yes-i-really-really-mean-it to confirm that "
+                               "you understand this.")
+            sys.exit(1)
+
+        self.app.LOG.debug("Stopping overcloud services")
+
+        # First prepare configuration.
+        self.generate_kolla_ansible_config(parsed_args)
+
+        # Perform the kolla-ansible stop.
+        extra_args = ["--yes-i-really-really-mean-it"]
+        self.run_kolla_ansible_overcloud(parsed_args, "stop",
+                                         extra_args=extra_args)
+
+        # Stop kayobe extra services.
+        playbooks = _build_playbook_list("overcloud-extras")
+        extra_vars = {"kayobe_action": "stop"}
+        self.run_kayobe_playbooks(parsed_args, playbooks,
+                                  extra_vars=extra_vars, limit="overcloud")
 
 
 class OvercloudServiceUpgrade(KollaAnsibleMixin, KayobeAnsibleMixin,

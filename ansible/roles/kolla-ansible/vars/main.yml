@@ -85,7 +85,6 @@ kolla_feature_flags:
   - ceph_rgw
   - ceph_nfs
   - ceph_dashboard
-  - chrony
   - cinder
   - cinder_backup
   - cinder_backend_hnas_nfs
