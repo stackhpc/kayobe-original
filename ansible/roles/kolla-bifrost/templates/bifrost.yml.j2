@@ -67,6 +67,13 @@ ipa_ramdisk_upstream_checksum_algo: "{{ kolla_bifrost_ipa_ramdisk_checksum_algor
 # Firewalld zone used by Bifrost.
 firewalld_internal_zone: "{{ kolla_bifrost_firewalld_internal_zone }}"
 
+# Ironic API URL.
+#
+# NOTE(priteau): This is normally constructed automatically by Bifrost, but it
+# uses information from hostvars[ans_interface_host] which fails to be
+# gathered.
+ironic_api_url: "http://localhost:6385/"
+
 {% if kolla_bifrost_extra_globals %}
 ###############################################################################
 # Extra configuration
