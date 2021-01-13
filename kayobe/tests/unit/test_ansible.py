@@ -53,7 +53,7 @@ class TestCase(unittest.TestCase):
         expected_env = {"KAYOBE_CONFIG_PATH": "/etc/kayobe"}
         mock_run.assert_called_once_with(expected_cmd, check_output=False,
                                          quiet=False, env=expected_env)
-        mock_vars.assert_called_once_with("/etc/kayobe")
+        mock_vars.assert_called_once_with(["/etc/kayobe"])
 
     @mock.patch.object(utils, "run_command")
     @mock.patch.object(ansible, "_get_vars_files")
@@ -69,6 +69,7 @@ class TestCase(unittest.TestCase):
             "-b",
             "-C",
             "--config-path", "/path/to/config",
+            "--environment", "test-env",
             "-e", "ev_name1=ev_value1",
             "-i", "/path/to/inventory",
             "-l", "group1:host",
@@ -93,10 +94,12 @@ class TestCase(unittest.TestCase):
             "playbook1.yml",
             "playbook2.yml",
         ]
-        expected_env = {"KAYOBE_CONFIG_PATH": "/path/to/config"}
+        expected_env = {"KAYOBE_CONFIG_PATH": "/path/to/config",
+                        "KAYOBE_ENVIRONMENT": "test-env"}
         mock_run.assert_called_once_with(expected_cmd, check_output=False,
                                          quiet=False, env=expected_env)
-        mock_vars.assert_called_once_with("/path/to/config")
+        mock_vars.assert_called_once_with(
+            ["/path/to/config", "/path/to/config/environments/test-env"])
 
     @mock.patch.object(utils, "run_command")
     @mock.patch.object(ansible, "_get_vars_files")
@@ -115,6 +118,7 @@ class TestCase(unittest.TestCase):
             "--become",
             "--check",
             "--config-path", "/path/to/config",
+            "--environment", "test-env",
             "--extra-vars", "ev_name1=ev_value1",
             "--inventory", "/path/to/inventory",
             "--limit", "group1:host1",
@@ -142,6 +146,7 @@ class TestCase(unittest.TestCase):
             "playbook2.yml",
         ]
         expected_env = {"KAYOBE_CONFIG_PATH": "/path/to/config",
+                        "KAYOBE_ENVIRONMENT": "test-env",
                         "KAYOBE_VAULT_PASSWORD": "test-pass"}
         expected_calls = [
             mock.call(["which", "kayobe-vault-password-helper"],
@@ -150,7 +155,8 @@ class TestCase(unittest.TestCase):
                       env=expected_env)
         ]
         self.assertEqual(expected_calls, mock_run.mock_calls)
-        mock_vars.assert_called_once_with("/path/to/config")
+        mock_vars.assert_called_once_with(
+            ["/path/to/config", "/path/to/config/environments/test-env"])
 
     @mock.patch.object(utils, "run_command")
     @mock.patch.object(ansible, "_get_vars_files")
@@ -263,7 +269,7 @@ class TestCase(unittest.TestCase):
         expected_env = {"KAYOBE_CONFIG_PATH": "/etc/kayobe"}
         mock_run.assert_called_once_with(expected_cmd, check_output=False,
                                          quiet=False, env=expected_env)
-        mock_vars.assert_called_once_with("/etc/kayobe")
+        mock_vars.assert_called_once_with(["/etc/kayobe"])
 
     @mock.patch.object(utils, "run_command")
     @mock.patch.object(ansible, "_get_vars_files")
@@ -292,7 +298,7 @@ class TestCase(unittest.TestCase):
         expected_env = {"KAYOBE_CONFIG_PATH": "/etc/kayobe"}
         mock_run.assert_called_once_with(expected_cmd, check_output=False,
                                          quiet=False, env=expected_env)
-        mock_vars.assert_called_once_with("/etc/kayobe")
+        mock_vars.assert_called_once_with(["/etc/kayobe"])
 
     @mock.patch.object(utils, "run_command")
     @mock.patch.object(ansible, "_get_vars_files")
@@ -321,7 +327,7 @@ class TestCase(unittest.TestCase):
         expected_env = {"KAYOBE_CONFIG_PATH": "/etc/kayobe"}
         mock_run.assert_called_once_with(expected_cmd, check_output=False,
                                          quiet=False, env=expected_env)
-        mock_vars.assert_called_once_with("/etc/kayobe")
+        mock_vars.assert_called_once_with(["/etc/kayobe"])
 
     @mock.patch.object(utils, "run_command")
     @mock.patch.object(ansible, "_get_vars_files")
