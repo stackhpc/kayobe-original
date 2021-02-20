@@ -28,6 +28,13 @@ def test_network_ethernet_vlan(host):
     assert interface.exists
     assert '192.168.35.1' in interface.addresses
     assert host.file('/sys/class/net/dummy2.42/lower_dummy2').exists
+    routes = host.check_output(
+        '/sbin/ip route show dev dummy2.42 table kayobe-test-route-table')
+    assert '192.168.40.0/24 via 192.168.35.254' in routes
+    rules = host.check_output(
+        '/sbin/ip rule show table kayobe-test-route-table')
+    expected = 'from 192.168.35.0/24 lookup kayobe-test-route-table'
+    assert expected in rules
 
 
 def test_network_bridge(host):
@@ -124,6 +131,42 @@ def test_timezone(host):
     status = host.check_output("timedatectl status")
     assert "Pacific/Honolulu" in status
 
+
+def test_ntp_alternative_services_disabled(host):
+    # Tests that we don't have any conflicting NTP servers running
+    # NOTE(wszumski): We always mask services even if they don't exist
+    ntpd_service = host.service("ntp")
+    assert ntpd_service.is_masked
+    assert not ntpd_service.is_running
+
+    timesyncd_service = host.service("systemd-timesyncd")
+    assert timesyncd_service.is_masked
+    assert not timesyncd_service.is_running
+
+
+def test_ntp_running(host):
+    # Tests that NTP services are enabled and running
+    assert host.package("chrony").is_installed
+    assert host.service("chronyd").is_enabled
+    assert host.service("chronyd").is_running
+
+
+def test_ntp_non_default_time_server(host):
+    # Tests that the NTP pool has been changed from pool.ntp.org to
+    # time.cloudflare.com
+    if 'centos' in host.system_info.distribution.lower():
+        chrony_config = host.file("/etc/chrony.conf")
+    else:
+        # Debian based distributions use the following path
+        chrony_config = host.file("/etc/chrony/chrony.conf")
+    assert chrony_config.exists
+    assert "time.cloudflare.com" in chrony_config.content_string
+
+
+def test_ntp_clock_synchronized(host):
+    # Tests that the clock is synchronized
+    status_output = host.check_output("timedatectl status")
+    assert "synchronized: yes" in status_output
 
 @pytest.mark.parametrize('repo', ["appstream", "baseos", "extras", "epel",
                                   "epel-modular"])
