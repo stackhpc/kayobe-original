@@ -10,8 +10,8 @@
   version: v0.1.4
 - src: mrlesmithjr.mdadm
   version: v0.1.0
-- src: stackhpc.ntp
-  version: 2.0.0
+- src: mrlesmithjr.chrony
+  version: v0.1.0
 - src: singleplatform-eng.users
   version: v1.2.5
 - src: stackhpc.dell-powerconnect-switch

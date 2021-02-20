@@ -131,7 +131,7 @@ overcloud_container_image_regex_map:
   # Chrony is typically used by default on CentOS 8 hosts. We don't know when
   # building images whether it is required, so to be sure we always build it.
   - regex: chrony
-    enabled: True
+    enabled: "{{ kolla_enable_chrony | bool }}"
   - regex: cinder
     enabled: "{{ kolla_enable_cinder | bool }}"
   - regex: cloudkitty

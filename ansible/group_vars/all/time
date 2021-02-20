@@ -1,16 +1,23 @@
 ---
-###############################################################################
-# OpenStack Ceph configuration.
+# Kayobe time configuration.
 
-# Ansible host pattern matching hosts on which Ceph storage services
-# are deployed. The default is to use hosts in the 'storage' group.
-#ceph_hosts:
+###############################################################################
+# Timezone.
+
+# Name of the local timezone.
+timezone: "{{ ansible_date_time.tz }}"
 
 ###############################################################################
 # Network Time Protocol (NTP).
 
 # Kayobe default time sources
-#chrony_ntp_servers_default:
+chrony_ntp_servers_default:
+  - server: pool.ntp.org
+    type: pool
+    options:
+      - option: iburst
+      - option: minpoll
+        val: 8
 
 # List of NTP time sources to configure. Format is a list of dictionaries with
 # the following keys:
@@ -30,8 +37,5 @@
 #       - option: maxsources
 #         val: 3
 #
-#chrony_ntp_servers:
-
+chrony_ntp_servers: "{{ chrony_ntp_servers_default }}"
 ###############################################################################
-# Dummy variable to allow Ansible to accept this file.
-workaround_ansible_issue_8743: yes
