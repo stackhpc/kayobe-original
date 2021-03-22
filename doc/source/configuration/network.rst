@@ -261,7 +261,7 @@ To configure a network called ``example`` with a default route and a
 
    example_routes:
      - cidr: 0.0.0.0/0
-       gateway 10.1.0.1
+       gateway: 10.1.0.1
        table: exampleroutetable
      - cidr: 10.1.0.0/24
        table: exampleroutetable
@@ -889,7 +889,7 @@ We could describe such a network as follows:
    external_neutron_allocation_pool_start: 10.0.3.128
    external_neutron_allocation_pool_end: 10.0.3.254
    external_routes:
-     - cidr 10.0.4.0/24
+     - cidr: 10.0.4.0/24
        gateway: 10.0.3.1
 
 We can map these networks to network interfaces on the seed and controller hosts:
