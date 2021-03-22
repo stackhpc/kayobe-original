@@ -137,11 +137,11 @@ function python_version {
 function install_dependencies {
     echo "Installing package dependencies for kayobe"
     if is_dnf; then
-        sudo dnf -y install gcc git vim python3-pyyaml python3-virtualenv libffi-devel
+        sudo dnf -y install gcc git vim python3-pyyaml python3-six python3-virtualenv libffi-devel
     elif is_yum; then
-        sudo yum -y install gcc git vim python2-virtualenv libffi-devel
+        sudo yum -y install gcc git vim python2-six python2-virtualenv libffi-devel
     else
-        sudo apt install -y python-dev python3-virtualenv gcc git libffi-dev
+        sudo apt install -y python-dev python3-six python3-virtualenv gcc git libffi-dev
     fi
 }
 
@@ -183,7 +183,10 @@ function install_kayobe_dev_venv {
 
 function upgrade_kayobe_venv {
     echo "Upgrading kayobe virtual environment in ${KAYOBE_VENV_PATH}"
-    virtualenv -p python$(python_version) "${KAYOBE_VENV_PATH}"
+    if [[ ! -e "${KAYOBE_VENV_PATH}" ]] || [[ ! -e "${KAYOBE_VENV_PATH}/bin/python$(python_version)" ]]; then
+        rm -rf "${KAYOBE_VENV_PATH}"
+        virtualenv -p python$(python_version) "${KAYOBE_VENV_PATH}"
+    fi
     # NOTE: Virtualenv's activate and deactivate scripts reference an
     # unbound variable.
     set +u
@@ -272,16 +275,6 @@ function seed_deploy {
     echo "Configuring the seed host"
     run_kayobe seed host configure
 
-    # Note: This must currently be done before host configure, because host
-    # configure runs kolla-ansible.yml, which validates the presence of the
-    # built deploy images.
-    if is_deploy_image_built_locally; then
-        echo "Building seed deployment images"
-        run_kayobe seed deployment image build
-    else
-        echo "Not building seed deployment images"
-    fi
-
     if [[ ${KAYOBE_SEED_CONTAINER_IMAGE_BUILD} = 1 ]]; then
         echo "Building seed container images"
         run_kayobe seed container image build
@@ -292,6 +285,13 @@ function seed_deploy {
 
     echo "Deploying containerised seed services"
     run_kayobe seed service deploy
+
+    if is_deploy_image_built_locally; then
+        echo "Building seed deployment images"
+        run_kayobe seed deployment image build
+    else
+        echo "Not building seed deployment images"
+    fi
 }
 
 function seed_upgrade {
@@ -397,6 +397,10 @@ function overcloud_upgrade {
         echo "Not building overcloud deployment images"
     fi
 
+    echo "Updating baremetal deployment images"
+    (source "${KOLLA_CONFIG_PATH:-/etc/kolla}/admin-openrc.sh" &&
+     run_kayobe baremetal compute update deployment image)
+
     if [[ ${KAYOBE_OVERCLOUD_CONTAINER_IMAGE_BUILD} = 1 ]]; then
         echo "Building overcloud container images"
         run_kayobe overcloud container image build
@@ -423,7 +427,8 @@ function overcloud_test_init {
 
     # Constraint with ${KAYOBE_SOURCE_PATH}/requirements.txt to ensure kayobe CLI doesn't get broken
     if [[ ! -z "$UPPER_CONSTRAINTS_FILE" ]]; then
-        pip install python-openstackclient -c "${KAYOBE_SOURCE_PATH}/requirements.txt" -c "$UPPER_CONSTRAINTS_FILE"
+        pip install python-openstackclient -c "$UPPER_CONSTRAINTS_FILE"
+        pip install cliff -c "${KAYOBE_SOURCE_PATH}/requirements.txt"
     else
         pip install python-openstackclient -c "${KAYOBE_SOURCE_PATH}/requirements.txt"
     fi

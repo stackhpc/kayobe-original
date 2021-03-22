@@ -198,11 +198,13 @@ def net_interface_obj(context, name, inventory_hostname=None):
             "Network interface for network '%s' on host '%s' not found" %
             (name, inventory_hostname))
     ip = net_ip(context, name, inventory_hostname)
-    if ip is None:
-        ip = '0.0.0.0'
     cidr = net_cidr(context, name, inventory_hostname)
     netmask = net_mask(context, name, inventory_hostname)
     gateway = net_gateway(context, name, inventory_hostname)
+    if ip is None:
+        ip = ''
+        gateway = None
+        netmask = None
     vlan = net_vlan(context, name, inventory_hostname)
     mtu = net_mtu(context, name, inventory_hostname)
     routes = net_routes(context, name, inventory_hostname)
@@ -211,6 +213,8 @@ def net_interface_obj(context, name, inventory_hostname=None):
     rules = net_rules(context, name, inventory_hostname)
     bootproto = net_bootproto(context, name, inventory_hostname)
     defroute = net_defroute(context, name, inventory_hostname)
+    vip_address = net_vip_address(context, name, inventory_hostname)
+    allowed_addresses = [vip_address] if vip_address else None
     interface = {
         'device': device,
         'address': ip,
@@ -222,6 +226,7 @@ def net_interface_obj(context, name, inventory_hostname=None):
         'rules': rules,
         'bootproto': bootproto or 'static',
         'defroute': defroute,
+        'allowed_addresses': allowed_addresses,
         'onboot': 'yes',
     }
     interface = {k: v for k, v in interface.items() if v is not None}
@@ -241,11 +246,13 @@ def net_bridge_obj(context, name, inventory_hostname=None):
             "Network interface for network '%s' on host '%s' not found" %
             (name, inventory_hostname))
     ip = net_ip(context, name, inventory_hostname)
-    if ip is None:
-        ip = '0.0.0.0'
     cidr = net_cidr(context, name, inventory_hostname)
     netmask = net_mask(context, name, inventory_hostname)
     gateway = net_gateway(context, name, inventory_hostname)
+    if ip is None:
+        ip = ''
+        gateway = None
+        netmask = None
     vlan = net_vlan(context, name, inventory_hostname)
     mtu = net_mtu(context, name, inventory_hostname)
     ports = net_bridge_ports(context, name, inventory_hostname)
@@ -255,6 +262,8 @@ def net_bridge_obj(context, name, inventory_hostname=None):
     rules = net_rules(context, name, inventory_hostname)
     bootproto = net_bootproto(context, name, inventory_hostname)
     defroute = net_defroute(context, name, inventory_hostname)
+    vip_address = net_vip_address(context, name, inventory_hostname)
+    allowed_addresses = [vip_address] if vip_address else None
     interface = {
         'device': device,
         'address': ip,
@@ -267,6 +276,7 @@ def net_bridge_obj(context, name, inventory_hostname=None):
         'rules': rules,
         'bootproto': bootproto or 'static',
         'defroute': defroute,
+        'allowed_addresses': allowed_addresses,
         'onboot': 'yes',
     }
     interface = {k: v for k, v in interface.items() if v is not None}
@@ -286,11 +296,13 @@ def net_bond_obj(context, name, inventory_hostname=None):
             "Network interface for network '%s' on host '%s' not found" %
             (name, inventory_hostname))
     ip = net_ip(context, name, inventory_hostname)
-    if ip is None:
-        ip = '0.0.0.0'
     cidr = net_cidr(context, name, inventory_hostname)
     netmask = net_mask(context, name, inventory_hostname)
     gateway = net_gateway(context, name, inventory_hostname)
+    if ip is None:
+        ip = ''
+        gateway = None
+        netmask = None
     vlan = net_vlan(context, name, inventory_hostname)
     mtu = net_mtu(context, name, inventory_hostname)
     mode = net_bond_mode(context, name, inventory_hostname)
@@ -306,6 +318,8 @@ def net_bond_obj(context, name, inventory_hostname=None):
     rules = net_rules(context, name, inventory_hostname)
     bootproto = net_bootproto(context, name, inventory_hostname)
     defroute = net_defroute(context, name, inventory_hostname)
+    vip_address = net_vip_address(context, name, inventory_hostname)
+    allowed_addresses = [vip_address] if vip_address else None
     interface = {
         'device': device,
         'address': ip,
@@ -324,6 +338,7 @@ def net_bond_obj(context, name, inventory_hostname=None):
         'rules': rules,
         'bootproto': bootproto or 'static',
         'defroute': defroute,
+        'allowed_addresses': allowed_addresses,
         'onboot': 'yes',
     }
     interface = {k: v for k, v in interface.items() if v is not None}

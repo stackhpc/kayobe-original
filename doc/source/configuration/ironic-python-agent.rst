@@ -53,7 +53,8 @@ image build``.
 ``ipa_build_dib_env_default``
     Dictionary of default environment variables to provide to Diskimage Builder
     (DIB) during IPA image build. Default is
-    ``{"DIB_REPOLOCATION_ironic_agent": "{{ ipa_build_source_url }}",
+    ``{"DIB_INSTALLTYPE_pip_and_virtualenv": "package",
+    "DIB_REPOLOCATION_ironic_agent": "{{ ipa_build_source_url }}",
     "DIB_REPOREF_ironic_agent": "{{ ipa_build_source_version }}"}``.
 ``ipa_build_dib_env_extra``
     Dictionary of additional environment variables to provide to Diskimage
@@ -68,6 +69,10 @@ image build``.
     for usage. Default is none.
 ``ipa_build_dib_packages``
     List of DIB packages to install. Default is none.
+``ipa_build_upper_constraints_file``
+    Upper constraints file for installing packages in the virtual environment
+    used for building IPA images. Default is ``{{ pip_upper_constraints_file
+    }}``.
 
 Example: Building IPA images locally
 ------------------------------------
@@ -263,6 +268,16 @@ inspection.
 Example: Adding the ``extra-hardware`` collector
 ------------------------------------------------
 
+.. note::
+
+    The ``hardware`` Python package has dropped support for Python 2. If you
+    are using an IPA image that uses Python 2 by default, for example CentOS 7,
+    you will need to use a version of the ``hardware`` package that is no
+    greater than ``0.23.x``. You can specify the version using the
+    ``DIB_IPA_HARDWARE_VERSION`` environment variable. This can be added
+    to the ``ipa_build_dib_env_extra`` dictionary in ``${KAYOBE_CONFIG_PATH}/ipa.yml``.
+    For example: ``DIB_IPA_HARDWARE_VERSION: "0.23.0"``.
+
 The ``extra-hardware`` collector may be used to collect additional information
 about hardware during inspection. It is also a requirement for running
 benchmarks. This collector depends on the Python `hardware package
@@ -293,13 +308,6 @@ package. It may be used as follows if building an IPA image locally:
        local: "{{ source_checkout_path }}/stackhpc-image-elements"
        version: "master"
        elements_path: "elements"
-
-   ipa_build_dib_env_extra:
-     # This is to workaround the fact that pip > 10 will produce an error if
-     # you try and uninstall a distuils installed package. Previous versions
-     # would remove the metadata only -  leaving the code intact, see:
-     # https://bugs.launchpad.net/diskimage-builder/+bug/1768135
-     DIB_INSTALLTYPE_pip_and_virtualenv: package
 
 Example: Passing additional kernel arguments to IPA
 ---------------------------------------------------
