@@ -30,12 +30,15 @@ DEFAULT_CONFIG_PATH = "/etc/kayobe"
 
 CONFIG_PATH_ENV = "KAYOBE_CONFIG_PATH"
 
+ENVIRONMENT_ENV = "KAYOBE_ENVIRONMENT"
+
 LOG = logging.getLogger(__name__)
 
 
 def add_args(parser):
     """Add arguments required for running Ansible playbooks to a parser."""
     default_config_path = os.getenv(CONFIG_PATH_ENV, DEFAULT_CONFIG_PATH)
+    default_environment = os.getenv(ENVIRONMENT_ENV)
     parser.add_argument("-b", "--become", action="store_true",
                         help="run operations with become (nopasswd implied)")
     parser.add_argument("-C", "--check", action="store_true",
@@ -45,11 +48,15 @@ def add_args(parser):
                         help="path to Kayobe configuration. "
                              "(default=$%s or %s)" %
                              (CONFIG_PATH_ENV, DEFAULT_CONFIG_PATH))
+    parser.add_argument("--environment", default=default_environment,
+                        help="specify environment name (default=$%s or None)" %
+                             ENVIRONMENT_ENV)
     parser.add_argument("-e", "--extra-vars", metavar="EXTRA_VARS",
                         action="append",
                         help="set additional variables as key=value or "
                              "YAML/JSON")
     parser.add_argument("-i", "--inventory", metavar="INVENTORY",
+                        action="append",
                         help="specify inventory host path "
                              "(default=$%s/inventory or %s/inventory) or "
                              "comma-separated host list" %
@@ -69,12 +76,34 @@ def add_args(parser):
                              "note this has no affect on kolla-ansible.")
 
 
-def _get_inventory_path(parsed_args):
-    """Return the path to the Kayobe inventory."""
+def _get_kayobe_environment_path(parsed_args):
+    """Return the path to the Kayobe environment or None if not specified."""
+    env_path = None
+    if parsed_args.environment:
+        # Specified via --environment or KAYOBE_ENVIRONMENT.
+        kc_environments = os.path.join(parsed_args.config_path, "environments")
+        env_path = os.path.join(kc_environments, parsed_args.environment)
+    return env_path
+
+
+def _get_inventories_paths(parsed_args, env_path):
+    """Return the paths to the Kayobe inventories."""
     if parsed_args.inventory:
         return parsed_args.inventory
     else:
-        return os.path.join(parsed_args.config_path, "inventory")
+        inventories = []
+        shared_inventory = os.path.join(parsed_args.config_path, "inventory")
+        if env_path:
+            if os.path.exists(shared_inventory):
+                inventories.append(shared_inventory)
+            env_inventory = os.path.join(env_path, "inventory")
+            if os.path.exists(env_inventory):
+                inventories.append(env_inventory)
+        else:
+            # Preserve existing behaviour: don't check if an inventory
+            # directory exists when no environment is specified
+            inventories.append(shared_inventory)
+        return inventories
 
 
 def _validate_args(parsed_args, playbooks):
@@ -86,12 +115,21 @@ def _validate_args(parsed_args, playbooks):
                   parsed_args.config_path, result["message"])
         sys.exit(1)
 
-    inventory = _get_inventory_path(parsed_args)
-    result = utils.is_readable_dir(inventory)
-    if not result["result"]:
-        LOG.error("Kayobe inventory %s is invalid: %s",
-                  inventory, result["message"])
-        sys.exit(1)
+    env_path = _get_kayobe_environment_path(parsed_args)
+    if env_path:
+        result = utils.is_readable_dir(env_path)
+        if not result["result"]:
+            LOG.error("Kayobe environment %s is invalid: %s",
+                      env_path, result["message"])
+            sys.exit(1)
+
+    inventories = _get_inventories_paths(parsed_args, env_path)
+    for inventory in inventories:
+        result = utils.is_readable_dir(inventory)
+        if not result["result"]:
+            LOG.error("Kayobe inventory %s is invalid: %s",
+                      inventory, result["message"])
+            sys.exit(1)
 
     for playbook in playbooks:
         result = utils.is_readable_file(playbook)
@@ -101,19 +139,25 @@ def _validate_args(parsed_args, playbooks):
             sys.exit(1)
 
 
-def _get_vars_files(config_path):
+def _get_vars_files(vars_paths):
     """Return a list of Kayobe Ansible configuration variable files.
 
-    The files will be sorted alphabetically by name.
+    The list of directories given as argument is searched to create the list of
+    variable files. The files will be sorted alphabetically by name for each
+    directory, but ordering of directories is kept to allow overrides.
     """
     vars_files = []
-    for vars_file in os.listdir(config_path):
-        abs_path = os.path.join(config_path, vars_file)
-        if utils.is_readable_file(abs_path)["result"]:
-            root, ext = os.path.splitext(vars_file)
-            if ext in (".yml", ".yaml", ".json"):
-                vars_files.append(abs_path)
-    return sorted(vars_files)
+    for vars_path in vars_paths:
+        path_vars_files = []
+        for vars_file in os.listdir(vars_path):
+            abs_path = os.path.join(vars_path, vars_file)
+            if utils.is_readable_file(abs_path)["result"]:
+                root, ext = os.path.splitext(vars_file)
+                if ext in (".yml", ".yaml", ".json"):
+                    path_vars_files.append(abs_path)
+        vars_files += sorted(path_vars_files)
+
+    return vars_files
 
 
 def build_args(parsed_args, playbooks,
@@ -126,9 +170,14 @@ def build_args(parsed_args, playbooks,
     if list_tasks or (parsed_args.list_tasks and list_tasks is None):
         cmd += ["--list-tasks"]
     cmd += vault.build_args(parsed_args, "--vault-password-file")
-    inventory = _get_inventory_path(parsed_args)
-    cmd += ["--inventory", inventory]
-    vars_files = _get_vars_files(parsed_args.config_path)
+    env_path = _get_kayobe_environment_path(parsed_args)
+    inventories = _get_inventories_paths(parsed_args, env_path)
+    for inventory in inventories:
+        cmd += ["--inventory", inventory]
+    vars_paths = [parsed_args.config_path]
+    if env_path:
+        vars_paths.append(env_path)
+    vars_files = _get_vars_files(vars_paths)
     for vars_file in vars_files:
         cmd += ["-e", "@%s" % vars_file]
     if parsed_args.extra_vars:
@@ -173,6 +222,10 @@ def run_playbooks(parsed_args, playbooks,
     # the environment variable is set, so that it can be referenced by
     # playbooks.
     env.setdefault(CONFIG_PATH_ENV, parsed_args.config_path)
+    # If an environment has been specified via --environment, ensure the
+    # environment variable is set, so that it can be referenced by playbooks.
+    if parsed_args.environment:
+        env.setdefault(ENVIRONMENT_ENV, parsed_args.environment)
     try:
         utils.run_command(cmd, check_output=check_output, quiet=quiet, env=env)
     except subprocess.CalledProcessError as e:

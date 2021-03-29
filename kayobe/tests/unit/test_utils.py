@@ -136,8 +136,9 @@ key2: value2
         self.assertEqual(expected, utils.escape_jinja(value))
 
     def test_detect_install_prefix(self):
-        path = "/tmp/test/local/lib/python2.7/dist-packages"
-        expected = os.path.normpath("/tmp/test/local/")
+        tmp_path = os.path.realpath('/tmp')
+        path = "%s/test/local/lib/python2.7/dist-packages" % tmp_path
+        expected = os.path.normpath("%s/test/local/" % tmp_path)
         result = utils._detect_install_prefix(path)
         self.assertEqual(expected, os.path.normpath(result))
 
