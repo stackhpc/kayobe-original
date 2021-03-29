@@ -1,0 +1,15 @@
+---
+
+- name: Destroy VMs
+  import_role:
+    name: stackhpc.libvirt-vm
+  vars:
+    infra_vm_configdrive_volume:
+      name: "{{ vm_name }}-configdrive"
+      pool: "{{ hostvars[vm_hostvars.infra_vm_hypervisor].infra_vm_pool }}"
+    libvirt_vm_name: "{{ vm_name }}"
+    libvirt_vm_memory_mb: "{{ vm_hostvars.infra_vm_memory_mb }}"
+    libvirt_vm_vcpus: "{{ vm_hostvars.infra_vm_vcpus }}"
+    libvirt_vm_volumes: "{{ vm_hostvars.infra_vm_volumes + [infra_vm_configdrive_volume] }}"
+    libvirt_vm_state: "absent"
+  become: True

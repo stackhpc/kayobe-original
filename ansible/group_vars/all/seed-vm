@@ -51,3 +51,44 @@ seed_vm_data_format: qcow2
 
 # List of network interfaces to attach to the seed VM.
 seed_vm_interfaces: "{{ network_interfaces | sort | map('net_libvirt_vm_network') | list }}"
+
+###############################################################################
+# Seed libvirt storage pool configuration.
+
+# List of libvirt storage pools for the seed hypervisor.
+seed_libvirt_pools:
+  - "{{ seed_libvirt_pool }}"
+
+# Libvirt storage pool for the seed VM.
+seed_libvirt_pool:
+  name: "{{ seed_libvirt_pool_name }}"
+  type: dir
+  path: "{{ seed_libvirt_pool_path }}"
+  mode: "{{ seed_libvirt_pool_mode }}"
+  owner: "{{ seed_libvirt_pool_owner }}"
+  group: "{{ seed_libvirt_pool_group }}"
+
+# Name of the libvirt storage pool for the seed VM.
+seed_libvirt_pool_name: "default"
+
+# Directory path of the libvirt storage pool for the seed VM.
+seed_libvirt_pool_path: "/var/lib/libvirt/images"
+
+# Directory mode of the libvirt storage pool for the seed VM.
+seed_libvirt_pool_mode: 711
+
+# Directory owner of the libvirt storage pool for the seed VM.
+seed_libvirt_pool_owner: "root"
+
+# Directory group of the libvirt storage pool for the seed VM.
+seed_libvirt_pool_group: "root"
+
+###############################################################################
+# Seed libvirt network configuration.
+
+# List of libvirt networks for the seed hypervisor.
+seed_libvirt_networks: >
+  {{ network_interfaces |
+     net_select_bridges |
+     map('net_libvirt_network') |
+     list }}

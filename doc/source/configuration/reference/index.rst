@@ -20,3 +20,4 @@ options.
    docker-registry
    seed-custom-containers
    nova-cells
+   infra-vms
