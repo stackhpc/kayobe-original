@@ -235,9 +235,9 @@ kolla_nova_compute_ironic_host:
 # Free form extra configuration to append to {{ kolla_config_path }}/globals.yml.
 kolla_extra_globals:
 
-# Path to a YAML file containing extra configuration to merge to {{
+# List of paths to YAML files containing extra configuration to merge to {{
 # kolla_config_path }}/globals.yml.
-kolla_extra_globals_path:
+kolla_extra_globals_paths:
 
 # Dictionary containing custom passwords to add or override in the Kolla
 # passwords file.

@@ -410,6 +410,72 @@
 #kolla_enable_zun:
 
 ###############################################################################
+# Kolla custom config options.
+
+# Override the the list of paths that are searched when looking for kolla custom
+# config. The default is to search the the environment specific path, if such a
+# path exists, and then shared config path. Files in the environment specific
+# directory override those found in the common configuration if the relative
+# path of the file is identical. This behaviour can be adjusted using the
+# configuration options below. For example, it is possible to merge yaml files
+# with the kolla_openstack_custom_config_merge_yml_globs variable.
+#kolla_extra_config_paths:
+
+# Default value for kolla_openstack_custom_config_include_globs.
+#kolla_openstack_custom_config_include_globs_default:
+
+# Extra items to add to kolla_openstack_custom_config_include_globs_default
+# to produce kolla_openstack_custom_config_include_globs.
+#kolla_openstack_custom_config_include_globs_extra:
+
+# List of dictionaries with the following keys:
+#   glob: a glob pattern. Any files matching this pattern will be copied to the
+#         the kolla custom config directory
+#   enabled: boolean to disable the glob.
+#kolla_openstack_custom_config_include_globs:
+
+# Default value for kolla_openstack_custom_config_template_exclude_globs.
+#kolla_openstack_custom_config_template_exclude_globs_default:
+
+# Extra items to add to kolla_openstack_custom_config_template_exclude_globs_default
+# to produce kolla_openstack_custom_config_template_exclude_globs.
+#kolla_openstack_custom_config_template_exclude_globs_extra:
+
+# List of globs. Any files matching these globs will not be templated.
+#kolla_openstack_custom_config_template_exclude_globs:
+
+# Default value for openstack_custom_config_merge_ini_globs.
+#kolla_openstack_custom_config_merge_ini_globs_default:
+
+# Extra items to add to kolla_openstack_custom_config_merge_ini_globs_default
+# to produce openstack_custom_config_merge_ini_globs.
+#kolla_openstack_custom_config_merge_ini_globs_extra:
+
+# List of dictionaries with following keys:
+#   glob: A glob pattern. Any files matching this pattern will be merged using
+#         the merge_configs filter.
+# E.g:
+#   kolla_openstack_custom_config_merge_ini_globs:
+#     - glob: "**/*.ini"
+#kolla_openstack_custom_config_merge_ini_globs:
+
+# Default value for openstack_custom_config_merge_yml_globs.
+#kolla_openstack_custom_config_merge_yml_globs_default:
+
+# Extra items to add to kolla_openstack_custom_config_merge_yml_globs_default
+# to produce openstack_custom_config_merge_yml_globs.
+#kolla_openstack_custom_config_merge_yml_globs_extra:
+
+# List of dictionaries with following keys:
+#   glob: A glob pattern. Any files matching this pattern will be merged using
+#         the merge_yaml ansible filter.
+# E.g:
+# kolla_openstack_custom_config_merge_yml_globs:
+#   - glob: "**/*.yml"
+#     merge_lists: false
+#kolla_openstack_custom_config_merge_yml_globs:
+
+###############################################################################
 # Passwords and credentials.
 
 # Dictionary containing default custom passwords to add or override in the

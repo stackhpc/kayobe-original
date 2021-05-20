@@ -35,6 +35,9 @@
       run_once: true
       with_items:
         - neutron
+        - aodh
+        # Check that subdirectories are handled correctly
+        - prometheus/prometheus.yml.d
 
     - name: Ensure extra configuration files exist
       copy:
@@ -73,3 +76,24 @@
         - octavia.conf
         - sahara.conf
         - zookeeper.cfg
+
+    - name: Template extra custom config files
+      # These correspond to globs defined in molecule.yml
+      copy:
+        content: "{{ item.content }}"
+        dest: "{{ kolla_extra_config_path }}/{{ item.dest }}"
+      run_once: true
+      delegate_to: localhost
+      with_items:
+        - dest: aodh/dummy.yml
+          content: |
+            dummy_variable: 123
+        - dest: aodh/dummy.ini
+          content: |
+            [dummy-section]
+            dummy_variable = 123
+        - dest: prometheus/prometheus.yml.d/dummy.yml
+          content: |
+            dummy_variable: 123
+      loop_control:
+        label: "{{ item.dest }}"

@@ -49,9 +49,7 @@
 
 - name: Ensure the Kolla global configuration file exists
   merge_yaml:
-    sources:
-      - "{{ role_path }}/templates/globals.yml.j2"
-      - "{{ kolla_extra_globals_path }}"
+    sources: "{{ kolla_extra_globals_paths | unique | list }}"
     dest: "{{ kolla_config_path }}/globals.yml"
     mode: 0640
   vars:

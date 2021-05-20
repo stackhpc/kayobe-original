@@ -19,47 +19,11 @@ from kayobe.tests.molecule import utils
 
 import pytest
 import testinfra.utils.ansible_runner
+import yaml
 
 
 testinfra_hosts = testinfra.utils.ansible_runner.AnsibleRunner(
     os.environ['MOLECULE_INVENTORY_FILE']).get_hosts('all')
-
-
-@pytest.mark.parametrize(
-    'path',
-    ['aodh',
-     'barbican',
-     'cinder',
-     'cloudkitty',
-     'designate',
-     'fluentd/filter',
-     'fluentd/input',
-     'fluentd/output',
-     'glance',
-     'grafana',
-     'heat',
-     'horizon',
-     'ironic',
-     'kafka',
-     'keystone',
-     'magnum',
-     'manila',
-     'mariadb',
-     'masakari',
-     'monasca',
-     'murano',
-     'neutron',
-     'nova',
-     'octavia',
-     'prometheus',
-     'sahara',
-     'storm',
-     'swift',
-     'zookeeper'])
-def test_service_config_directory(host, path):
-    path = os.path.join('/etc/kolla/config', path)
-    utils.test_directory(host, path)
-
 
 @pytest.mark.parametrize(
     'path',
@@ -85,7 +49,6 @@ def test_service_config_directory(host, path):
      'nova.conf',
      'octavia.conf',
      'sahara.conf',
-     'backup.my.cnf',
      'zookeeper.cfg'])
 def test_service_ini_file(host, path):
     # TODO(mgoddard): Check more of config file contents.
@@ -103,3 +66,24 @@ def test_service_non_ini_file(host, path):
     # TODO(mgoddard): Check config file contents.
     path = os.path.join('/etc/kolla/config', path)
     utils.test_file(host, path)
+
+
+@pytest.mark.parametrize(
+    'relative_path',
+    ['aodh/dummy.yml',
+     'prometheus/prometheus.yml.d/dummy.yml'])
+def test_service_extra_yml_config(host, relative_path):
+    path = os.path.join('/etc/kolla/config', relative_path)
+    utils.test_file(host, path)
+    content = yaml.safe_load(host.file(path).content_string)
+    assert content["dummy_variable"] == 123
+
+
+def test_service_extra_ini_config(host):
+    relative_path = "aodh/dummy.ini"
+    path = os.path.join('/etc/kolla/config', relative_path)
+    utils.test_file(host, path)
+    expected = {
+        "dummy-section": {"dummy_variable": "123"}
+    }
+    utils.test_ini_file(host, path, expected=expected)

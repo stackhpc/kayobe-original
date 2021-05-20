@@ -15,7 +15,14 @@ provisioner:
   inventory:
     group_vars:
       all:
-        kolla_extra_config_path: ${MOLECULE_TEMP_PATH:-/tmp}
+        kolla_extra_config_path: "${MOLECULE_TEMP_PATH:-/tmp}"
+        kolla_extra_config_paths:
+          - "{{ kolla_extra_config_path }}"
+          - "{{ role_path }}/templates/kolla/config"
+        kolla_openstack_custom_config_merge_yml_globs_extra:
+          - glob: aodh/dummy.yml
+        kolla_openstack_custom_config_merge_ini_globs_extra:
+          - glob: aodh/dummy.ini
         kolla_enable_aodh: true
         kolla_enable_barbican: true
         kolla_enable_blazar: true

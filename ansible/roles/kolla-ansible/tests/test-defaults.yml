@@ -40,6 +40,9 @@
             kolla_openstack_logging_debug: False
             apt_cache_valid_time: 3600
             kolla_extra_globals_path: "{{ tempfile_result.path ~ '/etc/kayobe/kolla/globals.yml' }}"
+            kolla_extra_globals_paths:
+              - "{{ kolla_extra_globals_path }}"
+              - "{{ role_path ~ 'templates/globals.yml.j2' }}"
 
         - name: Verify kolla-ansible installation
           shell: ". {{ temp_path }}/venv/bin/activate && kolla-ansible -h"
