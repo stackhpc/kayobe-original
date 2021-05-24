@@ -231,8 +231,13 @@ kolla_nova_compute_ironic_host:
 ###############################################################################
 # Extra free-form configuraton.
 
+# Deprecated:
 # Free form extra configuration to append to {{ kolla_config_path }}/globals.yml.
 kolla_extra_globals:
+
+# Path to a YAML file containing extra configuration to merge to {{
+# kolla_config_path }}/globals.yml.
+kolla_extra_globals_path:
 
 # Dictionary containing custom passwords to add or override in the Kolla
 # passwords file.
