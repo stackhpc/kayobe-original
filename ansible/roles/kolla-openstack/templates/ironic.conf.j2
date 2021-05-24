@@ -1,4 +1,4 @@
-# {{ ansible_managed }}
+# {% raw %}{{ ansible_managed }}{% endraw %}
 
 [DEFAULT]
 enabled_hardware_types: {{ kolla_ironic_enabled_hardware_types | join(',') }}

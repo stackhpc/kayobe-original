@@ -7,9 +7,12 @@
   with_items: "{{ kolla_openstack_custom_config }}"
   when: item.enabled | bool
 
+# TODO: are these all INI?
 - name: Ensure the Kolla OpenStack configuration files exist
-  template:
-    src: "{{ item.src }}"
+  merge_configs:
+    sources:
+      - "{{ role_path }}/templates/{{ item.src }}"
+      - "{{ kolla_extra_config_path }}/{{ item.dest }}"
     dest: "{{ kolla_node_custom_config_path }}/{{ item.dest }}"
     mode: 0640
   with_items:
@@ -91,8 +94,9 @@
   file:
     path: "{{ item.0.item.dest }}/{{ item.1.path | relpath(item.0.item.src) | dirname }}"
     recurse: true
+    # NOTE(wszumski): Recurse mode with mode changes permissions of files too which
+    # breaks idempotency.
     state: directory
-    mode: 0750
   with_subelements:
     - "{{ find_src_result.results }}"
     - files

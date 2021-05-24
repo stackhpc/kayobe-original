@@ -8,6 +8,7 @@ kolla_node_custom_config_path: /etc/kolla/config
 ###############################################################################
 # Global configuration.
 
+# Deprecated:
 # Free form extra configuration to append to global.conf.
 kolla_extra_global:
 
@@ -17,6 +18,7 @@ kolla_extra_global:
 # Whether to enable Aodh.
 kolla_enable_aodh:
 
+# Deprecated:
 # Free form extra configuration to append to aodh.conf.
 kolla_extra_aodh:
 
@@ -26,6 +28,7 @@ kolla_extra_aodh:
 # Whether to enable Barbican.
 kolla_enable_barbican:
 
+# Deprecated:
 # Free form extra configuration to append to barbican.conf.
 kolla_extra_barbican:
 
@@ -35,6 +38,7 @@ kolla_extra_barbican:
 # Whether to enable Blazar.
 kolla_enable_blazar:
 
+# Deprecated:
 # Free form extra configuration to append to blazar.conf.
 kolla_extra_blazar:
 
@@ -44,6 +48,7 @@ kolla_extra_blazar:
 # Whether to enable Ceilometer.
 kolla_enable_ceilometer:
 
+# Deprecated:
 # Free form extra configuration to append to ceilometer.conf.
 kolla_extra_ceilometer:
 
@@ -53,6 +58,7 @@ kolla_extra_ceilometer:
 # Whether to enable cinder.
 kolla_enable_cinder:
 
+# Deprecated:
 # Free form extra configuration to append to cinder.conf.
 kolla_extra_cinder:
 
@@ -62,6 +68,7 @@ kolla_extra_cinder:
 # Whether to enable CloudKitty.
 kolla_enable_cloudkitty:
 
+# Deprecated:
 # Free form extra configuration to append to cloudkitty.conf.
 kolla_extra_cloudkitty:
 
@@ -71,6 +78,7 @@ kolla_extra_cloudkitty:
 # Whether to enable designate.
 kolla_enable_designate:
 
+# Deprecated:
 # Free form extra configuration to append to designate.conf.
 kolla_extra_designate:
 
@@ -86,6 +94,7 @@ kolla_enable_elasticsearch:
 # Whether to enable Glance.
 kolla_enable_glance:
 
+# Deprecated:
 # Free form extra configuration to append to glance-api.conf and
 # glance-registry.conf.
 kolla_extra_glance:
@@ -96,6 +105,7 @@ kolla_extra_glance:
 # Whether to enable Gnocchi.
 kolla_enable_gnocchi:
 
+# Deprecated:
 # Free form extra configuration to append to gnocchi.conf.
 kolla_extra_gnocchi:
 
@@ -108,6 +118,7 @@ kolla_enable_grafana:
 # Name of the admin user for Grafana.
 grafana_local_admin_user_name:
 
+# Deprecated:
 # Free form extra configuration to append to grafana.ini.
 kolla_extra_grafana:
 
@@ -123,6 +134,7 @@ kolla_enable_haproxy:
 # Whether to enable Keystone.
 kolla_enable_keystone:
 
+# Deprecated:
 # Free form extra configuration to append to Keystone.conf
 kolla_extra_keystone:
 
@@ -132,6 +144,7 @@ kolla_extra_keystone:
 # Whether to enable Heat.
 kolla_enable_heat:
 
+# Deprecated:
 # Free form extra configuration to append to heat.conf.
 kolla_extra_heat:
 
@@ -262,6 +275,7 @@ kolla_ironic_provisioning_network:
 # List of additional append parameters for baremetal PXE boot.
 kolla_ironic_pxe_append_params: []
 
+# Deprecated:
 # Free form extra configuration to append to ironic.conf.
 kolla_extra_ironic:
 
@@ -326,6 +340,7 @@ kolla_inspector_enable_swift:
 # store.
 kolla_inspector_swift_auth: {}
 
+# Deprecated:
 # Free form extra configuration to append to ironic-inspector.conf.
 kolla_extra_inspector:
 
@@ -335,6 +350,7 @@ kolla_extra_inspector:
 # Whether to enable Kafka.
 kolla_enable_kafka:
 
+# Deprecated:
 # Free form extra configuration to append to kafka.server.properties.
 kolla_extra_kafka:
 
@@ -344,6 +360,7 @@ kolla_extra_kafka:
 # Whether to enable Magnum.
 kolla_enable_magnum:
 
+# Deprecated:
 # Free form extra configuration to append to magnum.conf.
 kolla_extra_magnum:
 
@@ -353,6 +370,7 @@ kolla_extra_magnum:
 # Whether to enable Mariabackup.
 kolla_enable_mariabackup:
 
+# Deprecated:
 # Free form extra configuration to append to backup.my.cnf.
 kolla_extra_mariabackup:
 
@@ -362,6 +380,7 @@ kolla_extra_mariabackup:
 # Whether to enable MariaDB.
 kolla_enable_mariadb:
 
+# Deprecated:
 # Free form extra configuration to append to galera.cnf.
 kolla_extra_mariadb:
 
@@ -371,12 +390,17 @@ kolla_extra_mariadb:
 # Whether to enable Manila.
 kolla_enable_manila:
 
+# Deprecated:
+# Free form extra configuration to append to manila.conf.
+kolla_extra_manila:
+
 ###############################################################################
 # Masakari configuration.
 
 # Whether to enable Masakari.
 kolla_enable_masakari:
 
+# Deprecated:
 # Free form extra configuration to append to masakari.conf.
 kolla_extra_masakari:
 
@@ -392,6 +416,7 @@ kolla_enable_monasca:
 # Whether to enable Murano.
 kolla_enable_murano:
 
+# Deprecated:
 # Free form extra configuration to append to murano.conf.
 kolla_extra_murano:
 
@@ -435,9 +460,11 @@ kolla_neutron_ml2_generic_switches: []
 # secret: not currently supported
 kolla_neutron_ml2_generic_switch_hosts: []
 
+# Deprecated:
 # Free form extra configuration to append to neutron.conf.
 kolla_extra_neutron:
 
+# Deprecated:
 # Free form extra configuration to append to ml2_conf.ini.
 kolla_extra_neutron_ml2:
 
@@ -447,6 +474,7 @@ kolla_extra_neutron_ml2:
 # Whether to enable Nova.
 kolla_enable_nova:
 
+# Deprecated:
 # Free form extra configuration to append to nova.conf.
 kolla_extra_nova:
 
@@ -455,6 +483,10 @@ kolla_extra_nova:
 
 # Whether to enable Octavia.
 kolla_enable_octavia:
+
+# Deprecated:
+# Free form extra configuration to append to octavia.conf
+kolla_extra_octavia:
 
 ###############################################################################
 # Prometheus configuration.
@@ -468,6 +500,7 @@ kolla_enable_prometheus:
 # Whether to enable sahara.
 kolla_enable_sahara:
 
+# Deprecated:
 # Free form extra configuration to append to sahara.conf.
 kolla_extra_sahara:
 
@@ -489,5 +522,6 @@ kolla_enable_swift:
 # Whether to enable Zookeeper.
 kolla_enable_zookeeper:
 
+# Deprecated:
 # Free form extra configuration to append to zookeeper.cfg.
 kolla_extra_zookeeper:

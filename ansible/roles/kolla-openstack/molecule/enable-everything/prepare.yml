@@ -25,3 +25,51 @@
       with_items:
         - "{{ kolla_inspector_ipa_kernel_path }}"
         - "{{ kolla_inspector_ipa_ramdisk_path }}"
+
+    - name: Ensure parent directories of configuration files exist
+      file:
+        path: "{{ kolla_extra_config_path }}/{{ item }}"
+        state: directory
+        recurse: yes
+      delegate_to: localhost
+      run_once: true
+      with_items:
+        - neutron
+
+    - name: Ensure extra configuration files exist
+      copy:
+        content: |
+          [extra-{{ item | basename }}]
+          foo=bar
+        dest: "{{ kolla_extra_config_path }}/{{ item }}"
+      run_once: true
+      delegate_to: localhost
+      loop:
+        - aodh.conf
+        - barbican.conf
+        - blazar.conf
+        - ceilometer.conf
+        - cinder.conf
+        - cloudkitty.conf
+        - designate.conf
+        - glance.conf
+        - global.conf
+        - gnocchi.conf
+        - grafana.ini
+        - heat.conf
+        - ironic.conf
+        - ironic-inspector.conf
+        - kafka.server.properties
+        - keystone.conf
+        - magnum.conf
+        - manila.conf
+        - murano.conf
+        - backup.my.cnf
+        - galera.cnf
+        - masakari.conf
+        - neutron.conf
+        - neutron/ml2_conf.ini
+        - nova.conf
+        - octavia.conf
+        - sahara.conf
+        - zookeeper.cfg
