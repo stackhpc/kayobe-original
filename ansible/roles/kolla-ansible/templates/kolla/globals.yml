@@ -574,6 +574,9 @@ enable_host_ntp: "{% raw %}{% if ansible_os_family == 'RedHat' and ansible_distr
 {% endif %}
 {% endif %}
 
+# Avoid disabling the firewall on CentOS, since we manage it in Kayobe.
+disable_firewall: "{% raw %}{{ ansible_facts.os_family == 'Debian' }}{% endraw %}"
+
 {% if kolla_extra_globals %}
 #######################
 # Extra configuration

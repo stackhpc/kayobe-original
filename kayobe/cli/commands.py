@@ -340,6 +340,7 @@ class SeedHypervisorHostConfigure(KollaAnsibleMixin, KayobeAnsibleMixin,
     * Optionally, wipe unmounted disk partitions (--wipe-disks).
     * Configure user accounts, group associations, and authorised SSH keys.
     * Configure the host's network interfaces.
+    * Configure a firewall.
     * Set sysctl parameters.
     * Configure NTP.
     * Optionally, configure software RAID arrays.
@@ -379,7 +380,7 @@ class SeedHypervisorHostConfigure(KollaAnsibleMixin, KayobeAnsibleMixin,
         if parsed_args.wipe_disks:
             playbooks += _build_playbook_list("wipe-disks")
         playbooks += _build_playbook_list(
-            "users", "dev-tools", "network", "sysctl", "time",
+            "users", "dev-tools", "network", "firewall", "sysctl", "time",
             "mdadm", "lvm", "seed-hypervisor-libvirt-host")
         self.run_kayobe_playbooks(parsed_args, playbooks,
                                   limit="seed-hypervisor")
@@ -494,6 +495,7 @@ class SeedHostConfigure(KollaAnsibleMixin, KayobeAnsibleMixin, VaultMixin,
     * Configure user accounts, group associations, and authorised SSH keys.
     * Disable SELinux.
     * Configure the host's network interfaces.
+    * Configure a firewall.
     * Set sysctl parameters.
     * Configure IP routing and source NAT.
     * Disable bootstrap interface configuration.
@@ -546,7 +548,7 @@ class SeedHostConfigure(KollaAnsibleMixin, KayobeAnsibleMixin, VaultMixin,
         if parsed_args.wipe_disks:
             playbooks += _build_playbook_list("wipe-disks")
         playbooks += _build_playbook_list(
-            "users", "dev-tools", "disable-selinux", "network",
+            "users", "dev-tools", "disable-selinux", "network", "firewall",
             "sysctl", "ip-routing", "snat", "disable-glean", "time", "mdadm",
             "lvm", "docker-devicemapper")
         self.run_kayobe_playbooks(parsed_args, playbooks, limit="seed")
@@ -947,7 +949,7 @@ class OvercloudHostConfigure(KollaAnsibleMixin, KayobeAnsibleMixin, VaultMixin,
         if parsed_args.wipe_disks:
             playbooks += _build_playbook_list("wipe-disks")
         playbooks += _build_playbook_list(
-            "users", "dev-tools", "disable-selinux", "network",
+            "users", "dev-tools", "disable-selinux", "network",  "firewall",
             "sysctl", "disable-glean", "disable-cloud-init", "time", "mdadm",
             "lvm", "docker-devicemapper")
         self.run_kayobe_playbooks(parsed_args, playbooks, limit="overcloud")
