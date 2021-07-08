@@ -66,7 +66,7 @@ class ConfigCollector(object):
                 if glob.globmatch(relative_path, glob_,
                         flags=glob.GLOBSTAR):
                     copy = {
-                        "src": sources[0],
+                        "src": sources[-1],
                         "dest": destination
                     }
                     actions["copy"].append(copy)
@@ -106,7 +106,7 @@ class ConfigCollector(object):
                 continue
 
             template = {
-                "src": sources[0],
+                "src": sources[-1],
                 "dest": destination
             }
             actions["template"].append(template)
