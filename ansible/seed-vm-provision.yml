@@ -3,7 +3,6 @@
   hosts: seed-hypervisor
   vars:
     seed_host: "{{ groups['seed'][0] }}"
-    seed_user_data_path: "{{ image_cache_path }}/seed-vm-user-data"
   pre_tasks:
     - name: Verify the seed host exists in the Ansible inventory
       fail:
@@ -19,22 +18,6 @@
         owner: "{{ ansible_user_uid }}"
         group: "{{ ansible_user_gid }}"
       become: True
-
-    # The user data script is used to bring up the network interfaces that will
-    # be configured by metadata in the configdrive. For some reason resolv.conf
-    # gets configured with 660 permissions, so fix that here also.
-    - name: Ensure the user data file exists
-      copy:
-        content: |
-          #!/bin/bash
-          {% for interface in hostvars[seed_host].network_interfaces | map('net_interface', seed_host) %}
-          # Bounce {{ interface }}.
-          ifdown {{ interface }}
-          ifup {{ interface }}
-          {% endfor %}
-          # Fix permissions of resolv.conf.
-          chmod 644 /etc/resolv.conf
-        dest: "{{ seed_user_data_path }}"
 
   roles:
     - role: jriguera.configdrive
@@ -55,7 +38,6 @@
         {{ hostvars[seed_host].network_interfaces |
            map('net_configdrive_network_device', seed_host) |
            list }}
-      configdrive_config_user_data_path: "{{ seed_user_data_path }}"
 
   tasks:
     - name: Set a fact containing the configdrive image path
@@ -73,7 +55,6 @@
         path: "{{ item }}"
         state: absent
       with_items:
-        - "{{ seed_user_data_path }}"
         - "{{ image_cache_path }}/{{ seed_host | to_uuid }}.gz"
 
 - name: Ensure that the seed VM is provisioned
@@ -105,8 +86,7 @@
           memory_mb: "{{ hostvars[seed_host].seed_vm_memory_mb }}"
           vcpus: "{{ hostvars[seed_host].seed_vm_vcpus }}"
           volumes: "{{ hostvars[seed_host].seed_vm_volumes + [seed_vm_configdrive_volume] }}"
-          interfaces: >
-            {{ hostvars[seed_host].network_interfaces | map('net_libvirt_vm_network') | list }}
+          interfaces: "{{ hostvars[seed_host].seed_vm_interfaces }}"
           console_log_enabled: true
       become: True
 
