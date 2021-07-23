@@ -208,6 +208,45 @@ This would configure the external FQDN for the staging environment at
 ``staging-api.example.com``, while the production external FQDN would be at
 ``production-api.example.com``.
 
+Environment Dependencies
+------------------------
+
+.. warning::
+
+   This is an experimental feature and is still subject to change whilst
+   the design is finalised.
+
+Multiple environments can be layered on top of each of each other by declaring
+dependencies in a ``.kayobe-environment`` file located in the environment
+subdirectory. For example:
+
+.. code-block:: yaml
+   :caption: ``$KAYOBE_CONFIG_PATH/environments/environment-C/.kayobe-environment``
+
+   dependencies:
+      - environment-B - environment-C
+
+.. code-block:: yaml
+      :caption: ``$KAYOBE_CONFIG_PATH/environments/environment-B/.kayobe-environment``
+
+      dependencies:
+         - environment-A
+
+Kayobe uses a dependency resolver to order these environments into a linear
+chain. Using the example above the chain would be resolved to:
+
+.. code-block:: text
+
+   C -> B -> A
+
+Where C is the environment with highest precedence. Kayobe will make sure to
+include the inventory and extra-vars in an order matching this chain when
+running any playbooks.
+
+This technique can be used to design fragments of re-useable configuration that
+can be shared across multiple environments, although care should be taken to
+make sure that these environments do not modify the same variables.
+
 Final Considerations
 --------------------
 

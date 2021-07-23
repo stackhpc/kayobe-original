@@ -13,7 +13,10 @@
 # under the License.
 
 import base64
+from collections import defaultdict
 import glob
+import graphlib
+import itertools
 import logging
 import os
 import shutil
@@ -265,3 +268,104 @@ def copy_dir(src, dest, exclude=None):
             copy_dir(src_path, dest_path)
         else:
             shutil.copy2(src_path, dest_path)
+
+
+def get_kayobe_environment_path(base_path, environment):
+    """Return the path to the Kayobe environment or None if not specified."""
+    env_path = None
+    if environment:
+        # Specified via --environment or KAYOBE_ENVIRONMENT.
+        kc_environments = os.path.join(base_path, "environments")
+        env_path = os.path.join(kc_environments, environment)
+    return env_path
+
+
+class EnvironmentFinder(object):
+    """Dependency resolver for kayobe environments
+
+    The constraints are specified via a .kayobe-environment file.
+    """
+
+    def __new__(cls, base_path, environment):
+        # Singleton instance so we don't have to resolve dependencies multiple
+        # times or pass round a single instance.
+        it = cls.__dict__.get("__it__")
+        if it is None:
+            it = {}
+        if (base_path, environment) in it:
+            return it[(base_path, environment)]
+        singleton = object.__new__(cls)
+        singleton._init(base_path, environment)
+        it[(base_path, environment)] = singleton
+        return singleton
+
+    def _init(self, base_path, environment):
+        self._base_path = base_path
+        self._environment = environment
+        self._ordering = None
+
+    def _update_dict(self, A, result):
+        for k in A:
+            result[k] = A[k].union(result[k])
+
+    @staticmethod
+    def _read_metadata(path):
+        if os.path.exists(path) and os.path.isfile(path):
+            metadata = read_yaml_file(path)
+            return metadata
+        return {}
+
+    def _collect(self, environment, result, visited):
+        # Updates result to contain dependency graph
+        base = self._base_path
+        env_path = os.path.join(base, 'environments', environment)
+        dot_environment_path = os.path.join(env_path, '.kayobe-environment')
+        if dot_environment_path in visited:
+            return
+        visited.add(dot_environment_path)
+        metadata = EnvironmentFinder._read_metadata(dot_environment_path)
+        dependencies = metadata.get("dependencies", [])
+        self._update_dict({environment: set(dependencies)}, result)
+        for dependency in dependencies:
+            self._collect(dependency, result, visited)
+
+    def ordered(self):
+        """List of environments ordered by the constraints"""
+        environment = self._environment
+        if not environment:
+            return []
+        if self._ordering is not None:
+            return self._ordering
+        graph = defaultdict(set)
+        self._collect(environment, graph, set())
+        ts = graphlib.TopologicalSorter(graph)
+        try:
+            ordering = list(ts.static_order())
+        except graphlib.graphlib.CycleError as e:
+            # https://docs.python.org/3/library/graphlib.html#graphlib.CycleError
+            cycle = e.args[1]
+            raise exception.Error("You have created a cycle with your "
+                                  "environment dependencies. Please break "
+                                  "this cycle and try again. The cycle is: %s"
+                                  % cycle)
+        self._ordering = ordering if ordering else [environment]
+        return self._ordering
+
+    def ordered_paths(self):
+        """Paths to each environment ordered by the constraints"""
+        result = []
+        environments = self.ordered()
+        for environment in environments:
+            full_path = get_kayobe_environment_path(
+                self._base_path,
+                environment
+            )
+            result.append(full_path)
+        return result
+
+    def ordered_inventories(self):
+        """Environment inventories ordered by the constraints"""
+        result = []
+        for path in self.ordered_paths():
+            result.append(os.path.join(path, "inventory"))
+        return result

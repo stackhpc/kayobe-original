@@ -7,5 +7,6 @@ selinux # MIT
 # INI parsing
 oslo.config>=5.2.0 # Apache-2.0
 wcmatch>=8.2<=9.0
-ansible-cached-lookup
-
+ansible-cached-lookup # MIT
+# NOTE(wszusmki): Remove this when min python>=3.9
+graphlib-backport # PSF

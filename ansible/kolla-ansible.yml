@@ -89,9 +89,9 @@
         kolla_external_fqdn_cert: "{{ kolla_config_path }}/certificates/haproxy.pem"
         kolla_internal_fqdn_cert: "{{ kolla_config_path }}/certificates/haproxy-internal.pem"
         kolla_ansible_passwords_path: "{{ kayobe_env_config_path }}/kolla/passwords.yml"
-        kolla_overcloud_group_vars_paths:
+        kolla_overcloud_group_vars_paths_static:
           - "{{ kayobe_config_path }}"
-          - "{{ kayobe_env_config_path }}"
+        kolla_overcloud_group_vars_paths: "{{ kolla_overcloud_group_vars_paths_static + kayobe_env_search_paths }}"
         kolla_ansible_certificates_path: "{{ kayobe_env_config_path }}/kolla/certificates"
         # NOTE: This differs from the default SELinux mode in kolla ansible,
         # which is permissive. The justification for using this mode is twofold:
@@ -107,9 +107,9 @@
         kolla_inspector_extra_kernel_options: "{{ inspector_extra_kernel_options }}"
         kolla_enable_host_ntp: false
         docker_daemon_mtu: "{{ public_net_name | net_mtu | default }}"
-        kolla_globals_paths_extra:
+        kolla_globals_paths_static:
           - "{{ kayobe_config_path }}"
-          - "{{ kayobe_env_config_path }}"
+        kolla_globals_paths_extra: "{{ kolla_globals_paths_static + kayobe_env_search_paths }}"
 
 - name: Generate Kolla Ansible host vars for the seed host
   hosts: seed

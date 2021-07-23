@@ -79,7 +79,11 @@ def _get_inventory_paths(parsed_args, inventory_filename):
         environments = ["kayobe"]
         if parsed_args.environment:
             environments.append(parsed_args.environment)
-
+        else:
+            environment_finder = utils.EnvironmentFinder(
+                parsed_args.config_path, parsed_args.environment)
+            for environment in environment_finder.ordered():
+                environments.append(environment)
         for environment in environments:
             candidate_path = os.path.join(
                 parsed_args.kolla_config_path, "extra-inventories",
