@@ -1,0 +1,4 @@
+---
+features:
+  - |
+    Add arista support for Neutron ML2 genericswitch driver
