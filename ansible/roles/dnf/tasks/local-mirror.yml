@@ -8,6 +8,16 @@
     mode: 0664
   become: True
   loop:
+    - CentOS-Linux-AppStream.repo
+    - CentOS-Linux-BaseOS.repo
+    - CentOS-Linux-Extras.repo
+
+- name: Remove old (pre CentOS 8.3) repo files
+  file:
+    path: /etc/yum.repos.d/{{ item }}
+    state: absent
+  become: True
+  loop:
     - CentOS-AppStream.repo
     - CentOS-Base.repo
     - CentOS-Extras.repo
@@ -38,9 +48,11 @@
   loop:
     - epel.repo
     - epel-modular.repo
+  when: dnf_install_epel | bool
 
 - name: Update cache
   dnf:
     name: []
     update_cache: yes
   become: True
+  when: dnf_install_epel | bool

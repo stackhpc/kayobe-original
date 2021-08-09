@@ -53,7 +53,8 @@ image build``.
 ``ipa_build_dib_env_default``
     Dictionary of default environment variables to provide to Diskimage Builder
     (DIB) during IPA image build. Default is
-    ``{"DIB_REPOLOCATION_ironic_agent": "{{ ipa_build_source_url }}",
+    ``{"DIB_INSTALLTYPE_pip_and_virtualenv": "package",
+    "DIB_REPOLOCATION_ironic_agent": "{{ ipa_build_source_url }}",
     "DIB_REPOREF_ironic_agent": "{{ ipa_build_source_version }}"}``.
 ``ipa_build_dib_env_extra``
     Dictionary of additional environment variables to provide to Diskimage
@@ -68,6 +69,10 @@ image build``.
     for usage. Default is none.
 ``ipa_build_dib_packages``
     List of DIB packages to install. Default is none.
+``ipa_build_upper_constraints_file``
+    Upper constraints file for installing packages in the virtual environment
+    used for building IPA images. Default is ``{{ pip_upper_constraints_file
+    }}``.
 
 Example: Building IPA images locally
 ------------------------------------
@@ -303,13 +308,6 @@ package. It may be used as follows if building an IPA image locally:
        local: "{{ source_checkout_path }}/stackhpc-image-elements"
        version: "master"
        elements_path: "elements"
-
-   ipa_build_dib_env_extra:
-     # This is to workaround the fact that pip > 10 will produce an error if
-     # you try and uninstall a distuils installed package. Previous versions
-     # would remove the metadata only -  leaving the code intact, see:
-     # https://bugs.launchpad.net/diskimage-builder/+bug/1768135
-     DIB_INSTALLTYPE_pip_and_virtualenv: package
 
 Example: Passing additional kernel arguments to IPA
 ---------------------------------------------------
