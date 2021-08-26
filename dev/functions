@@ -163,6 +163,9 @@ function install_venv {
         set +u
         source "${venv_path}/bin/activate"
         pip install -U pip
+        # Update setuptools as workaround for distutils.errors.DistutilsError:
+        # Could not find suitable distribution for Requirement.parse('pbr')
+        pip install -U setuptools
         pip install $pip_paths
         deactivate
         set -u
@@ -219,13 +222,16 @@ function run_kayobe {
 }
 
 function control_host_bootstrap {
+    attempts=10
+    interval=5
     echo "Bootstrapping the Ansible control host"
-    for i in $(seq 1 3); do
+    for i in $(seq 1 $attempts); do
         if run_kayobe control host bootstrap; then
             chb_success=1
             break
         fi
-        echo "Control host bootstrap failed - likely Ansible Galaxy flakiness. Retrying"
+        echo "Control host bootstrap failed - likely Ansible Galaxy flakiness. Sleeping $interval seconds before retrying"
+        sleep $interval
     done
     if [[ -z ${chb_success+x} ]]; then
         die $LINENO "Failed to bootstrap control host"
@@ -235,13 +241,16 @@ function control_host_bootstrap {
 }
 
 function control_host_upgrade {
+    attempts=10
+    interval=5
     echo "Upgrading the Ansible control host"
-    for i in $(seq 1 3); do
+    for i in $(seq 1 $attempts); do
         if run_kayobe control host upgrade; then
             chu_success=1
             break
         fi
-        echo "Control host upgrade failed - likely Ansible Galaxy flakiness. Retrying"
+        echo "Control host upgrade failed - likely Ansible Galaxy flakiness. Sleeping $interval seconds before retrying"
+        sleep $interval
     done
     if [[ -z ${chu_success+x} ]]; then
         die $LINENO "Failed to upgrade control host"
@@ -275,16 +284,6 @@ function seed_deploy {
     echo "Configuring the seed host"
     run_kayobe seed host configure
 
-    # Note: This must currently be done before host configure, because host
-    # configure runs kolla-ansible.yml, which validates the presence of the
-    # built deploy images.
-    if is_deploy_image_built_locally; then
-        echo "Building seed deployment images"
-        run_kayobe seed deployment image build
-    else
-        echo "Not building seed deployment images"
-    fi
-
     if [[ ${KAYOBE_SEED_CONTAINER_IMAGE_BUILD} = 1 ]]; then
         echo "Building seed container images"
         run_kayobe seed container image build
@@ -295,6 +294,13 @@ function seed_deploy {
 
     echo "Deploying containerised seed services"
     run_kayobe seed service deploy
+
+    if is_deploy_image_built_locally; then
+        echo "Building seed deployment images"
+        run_kayobe seed deployment image build
+    else
+        echo "Not building seed deployment images"
+    fi
 }
 
 function seed_upgrade {
@@ -430,7 +436,8 @@ function overcloud_test_init {
 
     # Constraint with ${KAYOBE_SOURCE_PATH}/requirements.txt to ensure kayobe CLI doesn't get broken
     if [[ ! -z "$UPPER_CONSTRAINTS_FILE" ]]; then
-        pip install python-openstackclient -c "${KAYOBE_SOURCE_PATH}/requirements.txt" -c "$UPPER_CONSTRAINTS_FILE"
+        pip install python-openstackclient -c "$UPPER_CONSTRAINTS_FILE"
+        pip install cliff -c "${KAYOBE_SOURCE_PATH}/requirements.txt"
     else
         pip install python-openstackclient -c "${KAYOBE_SOURCE_PATH}/requirements.txt"
     fi

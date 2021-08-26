@@ -1,6 +1,7 @@
 ---
 - name: Check whether Ironic is enabled
   hosts: controllers
+  gather_facts: False
   tags:
     - config
     - config-validation
@@ -10,9 +11,11 @@
     - name: Create controllers group with ironic enabled
       group_by:
         key: "controllers_with_ironic_enabled_{{ kolla_enable_ironic | bool }}"
+      changed_when: false
 
 - name: Ensure locally built Ironic Python Agent images are copied
   hosts: controllers_with_ironic_enabled_True[0]
+  gather_facts: False
   tags:
     - kolla-ansible
     - kolla-openstack
@@ -104,6 +107,7 @@
             mime: False
           register: stat_result
           with_items:
+            - { name: barbican, file: barbican.conf }
             - { name: blazar, file: blazar.conf }
             - { name: ceilometer, file: ceilometer.conf }
             - { name: ceph, file: ceph.conf }
@@ -212,6 +216,7 @@
         auth_type: none
         endpoint_override: "http://{% raw %}{{ api_interface_address }}{% endraw %}:{{ inspector_store_port }}"
       # Extra free-form user-provided configuration.
+      kolla_extra_barbican: "{{ kolla_extra_config.barbican | default }}"
       kolla_extra_blazar: "{{ kolla_extra_config.blazar | default }}"
       kolla_extra_ceilometer: "{{ kolla_extra_config.ceilometer | default }}"
       kolla_extra_ceph: "{{ kolla_extra_config.ceph | default }}"
