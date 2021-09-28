@@ -329,6 +329,7 @@ class TestCase(unittest.TestCase):
                     utils.get_data_files_path("ansible", "dev-tools.yml"),
                     utils.get_data_files_path("ansible", "network.yml"),
                     utils.get_data_files_path("ansible", "firewall.yml"),
+                    utils.get_data_files_path("ansible", "tuned.yml"),
                     utils.get_data_files_path("ansible", "sysctl.yml"),
                     utils.get_data_files_path("ansible", "time.yml"),
                     utils.get_data_files_path("ansible", "mdadm.yml"),
@@ -504,6 +505,7 @@ class TestCase(unittest.TestCase):
                         "ansible", "disable-selinux.yml"),
                     utils.get_data_files_path("ansible", "network.yml"),
                     utils.get_data_files_path("ansible", "firewall.yml"),
+                    utils.get_data_files_path("ansible", "tuned.yml"),
                     utils.get_data_files_path("ansible", "sysctl.yml"),
                     utils.get_data_files_path("ansible", "ip-routing.yml"),
                     utils.get_data_files_path("ansible", "snat.yml"),
@@ -996,6 +998,7 @@ class TestCase(unittest.TestCase):
                         "ansible", "disable-selinux.yml"),
                     utils.get_data_files_path("ansible", "network.yml"),
                     utils.get_data_files_path("ansible", "firewall.yml"),
+                    utils.get_data_files_path("ansible", "tuned.yml"),
                     utils.get_data_files_path("ansible", "sysctl.yml"),
                     utils.get_data_files_path("ansible", "disable-glean.yml"),
                     utils.get_data_files_path(
@@ -1275,6 +1278,7 @@ class TestCase(unittest.TestCase):
                         "ansible", "disable-selinux.yml"),
                     utils.get_data_files_path("ansible", "network.yml"),
                     utils.get_data_files_path("ansible", "firewall.yml"),
+                    utils.get_data_files_path("ansible", "tuned.yml"),
                     utils.get_data_files_path("ansible", "sysctl.yml"),
                     utils.get_data_files_path("ansible", "disable-glean.yml"),
                     utils.get_data_files_path(

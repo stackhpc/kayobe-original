@@ -417,6 +417,7 @@ class SeedHypervisorHostConfigure(KollaAnsibleMixin, KayobeAnsibleMixin,
     * Configure user accounts, group associations, and authorised SSH keys.
     * Configure the host's network interfaces.
     * Configure a firewall.
+    * Configure tuned profile.
     * Set sysctl parameters.
     * Configure timezone and ntp.
     * Optionally, configure software RAID arrays.
@@ -447,8 +448,8 @@ class SeedHypervisorHostConfigure(KollaAnsibleMixin, KayobeAnsibleMixin,
         if parsed_args.wipe_disks:
             playbooks += _build_playbook_list("wipe-disks")
         playbooks += _build_playbook_list(
-            "users", "dev-tools", "network", "firewall", "sysctl", "time",
-            "mdadm", "luks", "lvm", "seed-hypervisor-libvirt-host")
+            "users", "dev-tools", "network", "firewall", "tuned", "sysctl",
+            "time", "mdadm", "luks", "lvm", "seed-hypervisor-libvirt-host")
         self.run_kayobe_playbooks(parsed_args, playbooks,
                                   limit="seed-hypervisor")
 
@@ -567,6 +568,7 @@ class SeedHostConfigure(KollaAnsibleMixin, KayobeAnsibleMixin, VaultMixin,
     * Disable SELinux.
     * Configure the host's network interfaces.
     * Configure a firewall.
+    * Configure tuned profile.
     * Set sysctl parameters.
     * Configure IP routing and source NAT.
     * Disable bootstrap interface configuration.
@@ -604,7 +606,7 @@ class SeedHostConfigure(KollaAnsibleMixin, KayobeAnsibleMixin, VaultMixin,
             playbooks += _build_playbook_list("wipe-disks")
         playbooks += _build_playbook_list(
             "users", "dev-tools", "disable-selinux", "network", "firewall",
-            "sysctl", "ip-routing", "snat", "disable-glean", "time",
+            "tuned", "sysctl", "ip-routing", "snat", "disable-glean", "time",
             "mdadm", "luks", "lvm", "docker-devicemapper",
             "kolla-ansible-user", "kolla-pip", "kolla-target-venv")
         self.run_kayobe_playbooks(parsed_args, playbooks, limit="seed")
@@ -878,6 +880,7 @@ class InfraVMHostConfigure(KayobeAnsibleMixin, VaultMixin,
     * Disable SELinux.
     * Configure the host's network interfaces.
     * Configure a firewall.
+    * Configure tuned profile.
     * Set sysctl parameters.
     * Disable bootstrap interface configuration.
     * Configure timezone.
@@ -910,7 +913,7 @@ class InfraVMHostConfigure(KayobeAnsibleMixin, VaultMixin,
             playbooks += _build_playbook_list("wipe-disks")
         playbooks += _build_playbook_list(
             "users", "dev-tools", "disable-selinux", "network", "firewall",
-            "sysctl", "disable-glean", "disable-cloud-init", "time",
+            "tuned", "sysctl", "disable-glean", "disable-cloud-init", "time",
             "mdadm", "luks", "lvm", "docker-devicemapper", "docker")
         self.run_kayobe_playbooks(parsed_args, playbooks, limit="infra-vms")
 
@@ -1127,6 +1130,7 @@ class OvercloudHostConfigure(KollaAnsibleMixin, KayobeAnsibleMixin, VaultMixin,
     * Disable SELinux.
     * Configure the host's network interfaces.
     * Configure a firewall.
+    * Configure tuned profile.
     * Set sysctl parameters.
     * Disable bootstrap interface configuration.
     * Configure timezone and ntp.
@@ -1162,7 +1166,7 @@ class OvercloudHostConfigure(KollaAnsibleMixin, KayobeAnsibleMixin, VaultMixin,
             playbooks += _build_playbook_list("wipe-disks")
         playbooks += _build_playbook_list(
             "users", "dev-tools", "disable-selinux", "network", "firewall",
-            "sysctl", "disable-glean", "disable-cloud-init", "time",
+            "tuned", "sysctl", "disable-glean", "disable-cloud-init", "time",
             "mdadm", "luks", "lvm", "docker-devicemapper",
             "kolla-ansible-user", "kolla-pip", "kolla-target-venv")
         self.run_kayobe_playbooks(parsed_args, playbooks, limit="overcloud")
