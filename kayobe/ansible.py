@@ -51,8 +51,7 @@ def add_args(parser):
                              "YAML/JSON")
     parser.add_argument("-i", "--inventory", metavar="INVENTORY",
                         help="specify inventory host path "
-                             "(default=$%s/inventory or %s/inventory) or "
-                             "comma-separated host list" %
+                             "(default=$%s/inventory or %s/inventory) " %
                              (CONFIG_PATH_ENV, DEFAULT_CONFIG_PATH))
     parser.add_argument("-l", "--limit", metavar="SUBSET",
                         help="further limit selected hosts to an additional "
@@ -284,6 +283,7 @@ def prune_galaxy_roles(parsed_args):
         'resmo.ntp',
         'stackhpc.ntp',
         'stackhpc.os-shade',
+        'yatesr.timezone',
     ]
     LOG.debug("Removing roles: %s", ",".join(roles_to_remove))
     utils.galaxy_remove(roles_to_remove, "ansible/roles")

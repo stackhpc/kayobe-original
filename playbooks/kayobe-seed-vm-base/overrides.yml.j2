@@ -18,6 +18,10 @@ pip_upper_constraints_file: "/tmp/upper-constraints.txt"
 # enabled. Don't fail if it's disabled.
 libvirt_host_require_vt: false
 
+# Nested virtualisation is not working well in CI currently. Force the use of
+# QEMU.
+libvirt_vm_engine: "qemu"
+
 # Use the CI infra's PyPI mirror.
 pip_local_mirror: true
 pip_index_url: "http://{{ zuul_site_mirror_fqdn }}/pypi/simple"
@@ -33,7 +37,7 @@ seed_vm_memory_mb: "{{ 1 * 1024 }}"
 
 # Use cirros rather than CentOS for the VM.
 seed_bootstrap_user: cirros
-seed_vm_root_image: https://download.cirros-cloud.net/0.5.1/cirros-0.5.1-x86_64-disk.img
+seed_vm_root_image: /opt/cache/files/cirros-0.5.2-x86_64-disk.img
 
 # Cirros doesn't load cdom drivers by default.
 seed_vm_configdrive_device: disk
