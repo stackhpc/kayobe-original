@@ -6,16 +6,17 @@
 
 - name: Check whether Ironic is enabled
   hosts: controllers
+  gather_facts: False
   tags:
     - ipa-build
   tasks:
     - name: Create controllers group with ironic enabled
       group_by:
         key: "controllers_for_ipa_build_{{ kolla_enable_ironic | bool }}"
+      changed_when: false
 
 - name: Ensure Ironic Python Agent images are built and installed
   hosts: controllers_for_ipa_build_True[0]
-  gather_facts: False
   tags:
     - ipa-build
   vars:
@@ -23,13 +24,21 @@
     ipa_image_force_rebuild: false
   tasks:
     - block:
+        # TODO(priteau): Move this to stackhpc.os-images
+        - name: Ensure libgcrypt is updated
+          package:
+            name: "libgcrypt"
+            state: latest
+          become: True
+          when: ansible_facts.os_family == 'RedHat'
+
         - name: Ensure Ironic Python Agent images are built
           include_role:
             name: stackhpc.os-images
           vars:
             os_images_venv: "{{ virtualenv_path }}/ipa-build-dib"
             os_images_package_state: latest
-            os_images_upper_constraints_file: "{{ pip_upper_constraints_file }}"
+            os_images_upper_constraints_file: "{{ ipa_build_upper_constraints_file }}"
             os_images_cache: "{{ image_cache_path }}"
             os_images_common: ""
             os_images_list:

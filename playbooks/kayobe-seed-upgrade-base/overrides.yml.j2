@@ -4,6 +4,9 @@
 disable_selinux_do_reboot: false
 
 # Use the OpenStack infra's Dockerhub mirror.
+#
+# NOTE(priteau): Upgrade jobs use Docker Hub instead of quay.io, since the
+# latter only provides outdated train images.
 docker_registry_mirrors:
   - "http://{{ zuul_site_mirror_fqdn }}:8082/"
 

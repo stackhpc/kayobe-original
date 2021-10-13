@@ -58,6 +58,11 @@
         src: overrides.yml.j2
         dest: "{{ kayobe_config_src_dir }}/etc/kayobe/zz-overrides.yml"
 
+    - name: Ensure kolla-ansible globals.yml override config file exists
+      template:
+        src: globals.yml.j2
+        dest: "{{ kayobe_config_src_dir }}/etc/kayobe/kolla/globals.yml"
+
     # Perform a smoke test against the previous release.
 
     - block:
@@ -76,6 +81,12 @@
         - name: Ensure overcloud is upgraded
           shell:
             cmd: "{{ kayobe_src_dir }}/dev/overcloud-upgrade.sh &> {{ logs_dir }}/ansible/overcloud-upgrade"
+
+        # Remove unused Docker images to avoid reaching full disk
+        - name: Remove unused Docker images
+          shell:
+            cmd: "docker image prune --all --force"
+          become: true
 
         # Perform a smoke test against the upgraded current release.
 

@@ -215,13 +215,16 @@ function run_kayobe {
 }
 
 function control_host_bootstrap {
+    attempts=10
+    interval=5
     echo "Bootstrapping the Ansible control host"
-    for i in $(seq 1 3); do
+    for i in $(seq 1 $attempts); do
         if run_kayobe control host bootstrap; then
             chb_success=1
             break
         fi
-        echo "Control host bootstrap failed - likely Ansible Galaxy flakiness. Retrying"
+        echo "Control host bootstrap failed - likely Ansible Galaxy flakiness. Sleeping $interval seconds before retrying"
+        sleep $interval
     done
     if [[ -z ${chb_success+x} ]]; then
         die $LINENO "Failed to bootstrap control host"
@@ -231,13 +234,16 @@ function control_host_bootstrap {
 }
 
 function control_host_upgrade {
+    attempts=10
+    interval=5
     echo "Upgrading the Ansible control host"
-    for i in $(seq 1 3); do
+    for i in $(seq 1 $attempts); do
         if run_kayobe control host upgrade; then
             chu_success=1
             break
         fi
-        echo "Control host upgrade failed - likely Ansible Galaxy flakiness. Retrying"
+        echo "Control host upgrade failed - likely Ansible Galaxy flakiness. Sleeping $interval seconds before retrying"
+        sleep $interval
     done
     if [[ -z ${chu_success+x} ]]; then
         die $LINENO "Failed to upgrade control host"
@@ -273,16 +279,6 @@ function seed_deploy {
         run_kayobe seed host configure
     fi
 
-    # Note: This must currently be done before host configure, because host
-    # configure runs kolla-ansible.yml, which validates the presence of the
-    # built deploy images.
-    if is_deploy_image_built_locally; then
-        echo "Building seed deployment images"
-        run_kayobe seed deployment image build
-    else
-        echo "Not building seed deployment images"
-    fi
-
     if [[ ${KAYOBE_SEED_CONTAINER_IMAGE_BUILD} = 1 ]]; then
         echo "Building seed container images"
         run_kayobe seed container image build
@@ -294,6 +290,13 @@ function seed_deploy {
     if [[ ${KAYOBE_SEED_SERVICE_DEPLOY} = 1 ]]; then
         echo "Deploying containerised seed services"
         run_kayobe seed service deploy
+    fi
+
+    if is_deploy_image_built_locally; then
+        echo "Building seed deployment images"
+        run_kayobe seed deployment image build
+    else
+        echo "Not building seed deployment images"
     fi
 }
 
@@ -488,12 +491,14 @@ function overcloud_test {
         openstack server add floating ip ${name} ${ip}
     fi
     echo "$name: Waiting for ping and SSH access via ${ip}"
-    attempts=6
+    attempts=12
     for i in $(seq 1 $attempts); do
         if ping -c1 -W1 $ip && ssh -v -o StrictHostKeyChecking=no -o BatchMode=yes cirros@$ip hostname; then
             break
         elif [[ $i -eq $attempts ]]; then
             echo "Failed to access server $name via SSH after $attempts attempts"
+            echo "Console log:"
+            openstack console log show ${name}
             return 1
         else
             echo "Cannot access server $name - retrying"
