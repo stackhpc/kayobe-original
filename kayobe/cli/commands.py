@@ -447,7 +447,7 @@ class SeedHypervisorHostConfigure(KollaAnsibleMixin, KayobeAnsibleMixin,
                                   limit="seed-hypervisor")
 
         playbooks = _build_playbook_list(
-            "ssh-known-host", "kayobe-ansible-user",
+            "ssh-known-host", "kayobe-ansible-user", "proxy",
             "dnf", "pip", "kayobe-target-venv")
         if parsed_args.wipe_disks:
             playbooks += _build_playbook_list("wipe-disks")
@@ -598,7 +598,7 @@ class SeedHostConfigure(KollaAnsibleMixin, KayobeAnsibleMixin, VaultMixin,
 
         # Run kayobe playbooks.
         playbooks = _build_playbook_list(
-            "ssh-known-host", "kayobe-ansible-user",
+            "ssh-known-host", "kayobe-ansible-user", "proxy",
             "dnf", "pip", "kayobe-target-venv")
         if parsed_args.wipe_disks:
             playbooks += _build_playbook_list("wipe-disks")
@@ -967,7 +967,7 @@ class OvercloudHostConfigure(KollaAnsibleMixin, KayobeAnsibleMixin, VaultMixin,
 
         # Kayobe playbooks.
         playbooks = _build_playbook_list(
-            "ssh-known-host", "kayobe-ansible-user",
+            "ssh-known-host", "kayobe-ansible-user", "proxy",
             "dnf", "pip", "kayobe-target-venv")
         if parsed_args.wipe_disks:
             playbooks += _build_playbook_list("wipe-disks")
