@@ -136,6 +136,8 @@ net_rules = _make_attr_filter('rules')
 net_physical_network = _make_attr_filter('physical_network')
 net_bootproto = _make_attr_filter('bootproto')
 net_defroute = _make_attr_filter('defroute')
+net_ethtool_opts = _make_attr_filter('ethtool_opts')
+net_zone = _make_attr_filter('zone')
 
 
 @jinja2.contextfilter
@@ -213,6 +215,8 @@ def net_interface_obj(context, name, inventory_hostname=None):
     rules = net_rules(context, name, inventory_hostname)
     bootproto = net_bootproto(context, name, inventory_hostname)
     defroute = net_defroute(context, name, inventory_hostname)
+    ethtool_opts = net_ethtool_opts(context, name, inventory_hostname)
+    zone = net_zone(context, name, inventory_hostname)
     vip_address = net_vip_address(context, name, inventory_hostname)
     allowed_addresses = [vip_address] if vip_address else None
     interface = {
@@ -226,6 +230,8 @@ def net_interface_obj(context, name, inventory_hostname=None):
         'rules': rules,
         'bootproto': bootproto or 'static',
         'defroute': defroute,
+        'ethtool_opts': ethtool_opts,
+        'zone': zone,
         'allowed_addresses': allowed_addresses,
         'onboot': 'yes',
     }
@@ -262,6 +268,8 @@ def net_bridge_obj(context, name, inventory_hostname=None):
     rules = net_rules(context, name, inventory_hostname)
     bootproto = net_bootproto(context, name, inventory_hostname)
     defroute = net_defroute(context, name, inventory_hostname)
+    ethtool_opts = net_ethtool_opts(context, name, inventory_hostname)
+    zone = net_zone(context, name, inventory_hostname)
     vip_address = net_vip_address(context, name, inventory_hostname)
     allowed_addresses = [vip_address] if vip_address else None
     interface = {
@@ -276,6 +284,8 @@ def net_bridge_obj(context, name, inventory_hostname=None):
         'rules': rules,
         'bootproto': bootproto or 'static',
         'defroute': defroute,
+        'ethtool_opts': ethtool_opts,
+        'zone': zone,
         'allowed_addresses': allowed_addresses,
         'onboot': 'yes',
     }
@@ -318,6 +328,8 @@ def net_bond_obj(context, name, inventory_hostname=None):
     rules = net_rules(context, name, inventory_hostname)
     bootproto = net_bootproto(context, name, inventory_hostname)
     defroute = net_defroute(context, name, inventory_hostname)
+    ethtool_opts = net_ethtool_opts(context, name, inventory_hostname)
+    zone = net_zone(context, name, inventory_hostname)
     vip_address = net_vip_address(context, name, inventory_hostname)
     allowed_addresses = [vip_address] if vip_address else None
     interface = {
@@ -338,6 +350,8 @@ def net_bond_obj(context, name, inventory_hostname=None):
         'rules': rules,
         'bootproto': bootproto or 'static',
         'defroute': defroute,
+        'ethtool_opts': ethtool_opts,
+        'zone': zone,
         'allowed_addresses': allowed_addresses,
         'onboot': 'yes',
     }
@@ -494,6 +508,8 @@ class FilterModule(object):
             'net_physical_network': net_physical_network,
             'net_bootproto': net_bootproto,
             'net_defroute': net_defroute,
+            'net_ethtool_opts': net_ethtool_opts,
+            'net_zone': net_zone,
             'net_interface_obj': net_interface_obj,
             'net_bridge_obj': net_bridge_obj,
             'net_bond_obj': net_bond_obj,
