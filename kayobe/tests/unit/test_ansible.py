@@ -52,7 +52,7 @@ class TestCase(unittest.TestCase):
         expected_env = {"KAYOBE_CONFIG_PATH": "/etc/kayobe"}
         mock_run.assert_called_once_with(expected_cmd, check_output=False,
                                          quiet=False, env=expected_env)
-        mock_vars.assert_called_once_with("/etc/kayobe")
+        mock_vars.assert_called_once_with(["/etc/kayobe"])
 
     @mock.patch.object(utils, "run_command")
     @mock.patch.object(ansible, "_get_vars_files")
@@ -68,6 +68,7 @@ class TestCase(unittest.TestCase):
             "-b",
             "-C",
             "--config-path", "/path/to/config",
+            "--environment", "test-env",
             "-e", "ev_name1=ev_value1",
             "-i", "/path/to/inventory",
             "-l", "group1:host",
@@ -92,10 +93,12 @@ class TestCase(unittest.TestCase):
             "playbook1.yml",
             "playbook2.yml",
         ]
-        expected_env = {"KAYOBE_CONFIG_PATH": "/path/to/config"}
+        expected_env = {"KAYOBE_CONFIG_PATH": "/path/to/config",
+                        "KAYOBE_ENVIRONMENT": "test-env"}
         mock_run.assert_called_once_with(expected_cmd, check_output=False,
                                          quiet=False, env=expected_env)
-        mock_vars.assert_called_once_with("/path/to/config")
+        mock_vars.assert_called_once_with(
+            ["/path/to/config", "/path/to/config/environments/test-env"])
 
     @mock.patch.object(utils, "run_command")
     @mock.patch.object(ansible, "_get_vars_files")
@@ -114,6 +117,7 @@ class TestCase(unittest.TestCase):
             "--become",
             "--check",
             "--config-path", "/path/to/config",
+            "--environment", "test-env",
             "--extra-vars", "ev_name1=ev_value1",
             "--inventory", "/path/to/inventory",
             "--limit", "group1:host1",
@@ -141,6 +145,7 @@ class TestCase(unittest.TestCase):
             "playbook2.yml",
         ]
         expected_env = {"KAYOBE_CONFIG_PATH": "/path/to/config",
+                        "KAYOBE_ENVIRONMENT": "test-env",
                         "KAYOBE_VAULT_PASSWORD": "test-pass"}
         expected_calls = [
             mock.call(["which", "kayobe-vault-password-helper"],
@@ -149,7 +154,8 @@ class TestCase(unittest.TestCase):
                       env=expected_env)
         ]
         self.assertEqual(expected_calls, mock_run.mock_calls)
-        mock_vars.assert_called_once_with("/path/to/config")
+        mock_vars.assert_called_once_with(
+            ["/path/to/config", "/path/to/config/environments/test-env"])
 
     @mock.patch.object(utils, "run_command")
     @mock.patch.object(ansible, "_get_vars_files")
@@ -262,7 +268,7 @@ class TestCase(unittest.TestCase):
         expected_env = {"KAYOBE_CONFIG_PATH": "/etc/kayobe"}
         mock_run.assert_called_once_with(expected_cmd, check_output=False,
                                          quiet=False, env=expected_env)
-        mock_vars.assert_called_once_with("/etc/kayobe")
+        mock_vars.assert_called_once_with(["/etc/kayobe"])
 
     @mock.patch.object(utils, "run_command")
     @mock.patch.object(ansible, "_get_vars_files")
@@ -291,7 +297,7 @@ class TestCase(unittest.TestCase):
         expected_env = {"KAYOBE_CONFIG_PATH": "/etc/kayobe"}
         mock_run.assert_called_once_with(expected_cmd, check_output=False,
                                          quiet=False, env=expected_env)
-        mock_vars.assert_called_once_with("/etc/kayobe")
+        mock_vars.assert_called_once_with(["/etc/kayobe"])
 
     @mock.patch.object(utils, "run_command")
     @mock.patch.object(ansible, "_get_vars_files")
@@ -320,7 +326,7 @@ class TestCase(unittest.TestCase):
         expected_env = {"KAYOBE_CONFIG_PATH": "/etc/kayobe"}
         mock_run.assert_called_once_with(expected_cmd, check_output=False,
                                          quiet=False, env=expected_env)
-        mock_vars.assert_called_once_with("/etc/kayobe")
+        mock_vars.assert_called_once_with(["/etc/kayobe"])
 
     @mock.patch.object(utils, "run_command")
     @mock.patch.object(utils, "is_readable_file")
@@ -346,7 +352,7 @@ class TestCase(unittest.TestCase):
         }
         mock_run.assert_called_once_with(expected_cmd, check_output=False,
                                          quiet=False, env=expected_env)
-        mock_vars.assert_called_once_with("/etc/kayobe")
+        mock_vars.assert_called_once_with(["/etc/kayobe"])
         mock_readable.assert_called_once_with("/etc/kayobe/ansible.cfg")
 
     @mock.patch.object(utils, "run_command")
@@ -374,7 +380,7 @@ class TestCase(unittest.TestCase):
         }
         mock_run.assert_called_once_with(expected_cmd, check_output=False,
                                          quiet=False, env=expected_env)
-        mock_vars.assert_called_once_with("/etc/kayobe")
+        mock_vars.assert_called_once_with(["/etc/kayobe"])
         mock_readable.assert_called_once_with("/etc/kayobe/ansible.cfg")
 
     @mock.patch.object(utils, "run_command")
@@ -556,3 +562,147 @@ class TestCase(unittest.TestCase):
         self.assertTrue(result)
         mock_is_readable.assert_called_once_with(
             "/path/to/config/kolla/passwords.yml")
+
+    @mock.patch.object(utils, "run_command")
+    @mock.patch.object(ansible, "_get_vars_files")
+    @mock.patch.object(ansible, "_validate_args")
+    def test_multiple_inventory_args(self, mock_validate, mock_vars, mock_run):
+        mock_vars.return_value = []
+        parser = argparse.ArgumentParser()
+        ansible.add_args(parser)
+        vault.add_args(parser)
+        args = [
+            "--inventory", "/etc/kayobe/inventory",
+            "--inventory", "/etc/kayobe/environments/foobar/inventory",
+        ]
+        parsed_args = parser.parse_args(args)
+        ansible.run_playbooks(parsed_args, ["playbook1.yml", "playbook2.yml"])
+        expected_cmd = [
+            "ansible-playbook",
+            "--inventory", "/etc/kayobe/inventory",
+            "--inventory", "/etc/kayobe/environments/foobar/inventory",
+            "playbook1.yml",
+            "playbook2.yml",
+        ]
+        expected_env = {"KAYOBE_CONFIG_PATH": "/etc/kayobe"}
+        mock_run.assert_called_once_with(expected_cmd, check_output=False,
+                                         quiet=False, env=expected_env)
+        mock_vars.assert_called_once_with(["/etc/kayobe"])
+
+    @mock.patch.object(os.path, "exists")
+    @mock.patch.object(utils, "run_command")
+    @mock.patch.object(ansible, "_get_vars_files")
+    @mock.patch.object(ansible, "_validate_args")
+    def test_multiple_inventories(self, mock_validate, mock_vars, mock_run,
+                                  mock_exists):
+        mock_vars.return_value = []
+        # os.path.exists gets called three times:
+        # 1) shared inventory
+        # 2) environment inventory
+        # 3) ansible.cfg
+        mock_exists.side_effect = [True, True, False]
+        parser = argparse.ArgumentParser()
+        ansible.add_args(parser)
+        vault.add_args(parser)
+        args = [
+            "--environment", "test-env",
+        ]
+        parsed_args = parser.parse_args(args)
+        ansible.run_playbooks(parsed_args, ["playbook1.yml", "playbook2.yml"])
+        expected_cmd = [
+            "ansible-playbook",
+            "--inventory", "/etc/kayobe/inventory",
+            "--inventory", "/etc/kayobe/environments/test-env/inventory",
+            "playbook1.yml",
+            "playbook2.yml",
+        ]
+        expected_env = {"KAYOBE_CONFIG_PATH": "/etc/kayobe",
+                        "KAYOBE_ENVIRONMENT": "test-env"}
+        expected_calls = [
+            mock.call("/etc/kayobe/inventory"),
+            mock.call("/etc/kayobe/environments/test-env/inventory"),
+            mock.call("/etc/kayobe/ansible.cfg"),
+        ]
+        self.assertEqual(expected_calls, mock_exists.mock_calls)
+        mock_run.assert_called_once_with(expected_cmd, check_output=False,
+                                         quiet=False, env=expected_env)
+        mock_vars.assert_called_once_with(
+            ["/etc/kayobe", "/etc/kayobe/environments/test-env"])
+
+    @mock.patch.object(os.path, "exists")
+    @mock.patch.object(utils, "run_command")
+    @mock.patch.object(ansible, "_get_vars_files")
+    @mock.patch.object(ansible, "_validate_args")
+    def test_shared_inventory_only(self, mock_validate, mock_vars, mock_run,
+                                   mock_exists):
+        mock_vars.return_value = []
+        # os.path.exists gets called three times:
+        # 1) shared inventory
+        # 2) environment inventory
+        # 3) ansible.cfg
+        mock_exists.side_effect = [True, False, False]
+        parser = argparse.ArgumentParser()
+        ansible.add_args(parser)
+        vault.add_args(parser)
+        args = [
+            "--environment", "test-env",
+        ]
+        parsed_args = parser.parse_args(args)
+        ansible.run_playbooks(parsed_args, ["playbook1.yml", "playbook2.yml"])
+        expected_cmd = [
+            "ansible-playbook",
+            "--inventory", "/etc/kayobe/inventory",
+            "playbook1.yml",
+            "playbook2.yml",
+        ]
+        expected_env = {"KAYOBE_CONFIG_PATH": "/etc/kayobe",
+                        "KAYOBE_ENVIRONMENT": "test-env"}
+        expected_calls = [
+            mock.call("/etc/kayobe/inventory"),
+            mock.call("/etc/kayobe/environments/test-env/inventory"),
+            mock.call("/etc/kayobe/ansible.cfg"),
+        ]
+        self.assertEqual(expected_calls, mock_exists.mock_calls)
+        mock_run.assert_called_once_with(expected_cmd, check_output=False,
+                                         quiet=False, env=expected_env)
+        mock_vars.assert_called_once_with(
+            ["/etc/kayobe", "/etc/kayobe/environments/test-env"])
+
+    @mock.patch.object(os.path, "exists")
+    @mock.patch.object(utils, "run_command")
+    @mock.patch.object(ansible, "_get_vars_files")
+    @mock.patch.object(ansible, "_validate_args")
+    def test_env_inventory_only(self, mock_validate, mock_vars, mock_run,
+                                mock_exists):
+        mock_vars.return_value = []
+        # os.path.exists gets called three times:
+        # 1) shared inventory
+        # 2) environment inventory
+        # 3) ansible.cfg
+        mock_exists.side_effect = [False, True, False]
+        parser = argparse.ArgumentParser()
+        ansible.add_args(parser)
+        vault.add_args(parser)
+        args = [
+            "--environment", "test-env",
+        ]
+        parsed_args = parser.parse_args(args)
+        ansible.run_playbooks(parsed_args, ["playbook1.yml", "playbook2.yml"])
+        expected_cmd = [
+            "ansible-playbook",
+            "--inventory", "/etc/kayobe/environments/test-env/inventory",
+            "playbook1.yml",
+            "playbook2.yml",
+        ]
+        expected_env = {"KAYOBE_CONFIG_PATH": "/etc/kayobe",
+                        "KAYOBE_ENVIRONMENT": "test-env"}
+        expected_calls = [
+            mock.call("/etc/kayobe/inventory"),
+            mock.call("/etc/kayobe/environments/test-env/inventory"),
+            mock.call("/etc/kayobe/ansible.cfg"),
+        ]
+        self.assertEqual(expected_calls, mock_exists.mock_calls)
+        mock_run.assert_called_once_with(expected_cmd, check_output=False,
+                                         quiet=False, env=expected_env)
+        mock_vars.assert_called_once_with(
+            ["/etc/kayobe", "/etc/kayobe/environments/test-env"])
