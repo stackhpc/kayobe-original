@@ -1,0 +1,10 @@
+---
+- name: Install CA certificates and gnupg packages
+  package:
+    name:
+      - ca-certificates
+      - gnupg
+    state: present
+    cache_valid_time: "{{ apt_cache_valid_time if ansible_facts.os_family == 'Debian' else omit }}"
+    update_cache: true
+  become: true

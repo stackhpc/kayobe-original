@@ -10,6 +10,11 @@ import distro
 import pytest
 
 
+def _is_apt():
+    info = distro.linux_distribution()
+    return info[0].startswith('Ubuntu')
+
+
 def _is_dnf():
     info = distro.linux_distribution()
     return info[0] == 'CentOS Linux' and info[1].startswith('8')
@@ -169,6 +174,13 @@ def test_ntp_clock_synchronized(host):
     # Tests that the clock is synchronized
     status_output = host.check_output("timedatectl status")
     assert "synchronized: yes" in status_output
+
+
+@pytest.mark.skipif(not _is_apt(), reason="Apt only supported on Ubuntu")
+def test_apt_custom_package_repository_is_available(host):
+    with host.sudo():
+        host.check_output("apt -y install td-agent")
+    assert host.package("td-agent").is_installed
 
 
 @pytest.mark.parametrize('repo', ["appstream", "baseos", "extras", "epel",
