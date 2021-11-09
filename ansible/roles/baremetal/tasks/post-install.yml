@@ -61,13 +61,6 @@
     state: directory
   become: True
 
-- name: Merge Zun docker config
-  set_fact:
-    docker_config: "{{ docker_config | combine(docker_zun_config) }}"
-  when:
-    - docker_configure_for_zun | bool
-    - "'zun-compute' in group_names"
-
 - name: Warn about deprecations
   debug:
     msg: >
@@ -151,7 +144,6 @@
     state: absent
   when:
     - not docker_custom_option
-    - not docker_configure_for_zun | bool or 'zun-compute' not in group_names
     - not docker_http_proxy
     - not docker_https_proxy
     - not docker_no_proxy
@@ -164,7 +156,6 @@
     recurse: yes
   when: >
     docker_custom_option | length > 0 or
-    (docker_configure_for_zun | bool and 'zun-compute' in group_names) or
     docker_http_proxy | length > 0 or
     docker_https_proxy | length > 0 or
     docker_no_proxy | length > 0
@@ -176,7 +167,6 @@
     dest: /etc/systemd/system/docker.service.d/kolla.conf
   when: >
     docker_custom_option | length > 0 or
-    (docker_configure_for_zun | bool and 'zun-compute' in group_names) or
     docker_http_proxy | length > 0 or
     docker_https_proxy | length > 0 or
     docker_no_proxy | length > 0

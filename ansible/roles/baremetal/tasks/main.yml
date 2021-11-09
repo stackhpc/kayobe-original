@@ -1,2 +1,6 @@
 ---
-- include_tasks: "{{ kolla_action }}.yml"
+- import_tasks: pre-install.yml
+
+- import_tasks: install.yml
+
+- import_tasks: post-install.yml

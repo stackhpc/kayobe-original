@@ -78,3 +78,7 @@ virtualenv:
 # directory. This is typically required for modules such as yum and apt which
 # are not available on PyPI.
 virtualenv_site_packages: True
+
+# From group_vars/all.yml:
+docker_log_max_file: "5"
+docker_log_max_size: "50m"
