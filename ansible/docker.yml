@@ -3,7 +3,15 @@
   hosts: docker
   tags:
     - docker
-  vars:
-    - docker_upper_constraints_file: "{{ pip_upper_constraints_file }}"
-  roles:
-    - role: docker
+  tasks:
+    # TODO(mgoddard): check all of kayobe docker role is implemented.
+    - import_role:
+        name: openstack.kolla.docker
+      vars:
+        docker_custom_config: "{{ lookup('template', 'roles/kolla-ansible/templates/daemon.json.j2') | to_nice_json | indent(2) }}"
+        # The following variables are used in the above template:
+        docker_registry_mirrors: []
+        docker_daemon_mtu: "{{ public_net_name | net_mtu | default }}"
+        docker_daemon_live_restore: false
+        docker_upper_constraints_file: "{{ pip_upper_constraints_file }}"
+        docker_configure_for_zun: "{{ kolla_enable_zun | bool }}"

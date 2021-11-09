@@ -1,0 +1,8 @@
+---
+- name: Ensure /etc/hosts is configured
+  hosts: overcloud
+  tags:
+    - etc-hosts
+  tasks:
+    - import_role:
+        name: etc-hosts

@@ -480,9 +480,7 @@ class TestCase(unittest.TestCase):
 
     @mock.patch.object(commands.KayobeAnsibleMixin,
                        "run_kayobe_playbooks")
-    @mock.patch.object(commands.KollaAnsibleMixin,
-                       "run_kolla_ansible_seed")
-    def test_seed_host_configure(self, mock_kolla_run, mock_run):
+    def test_seed_host_configure(self, mock_run):
         command = commands.SeedHostConfigure(TestApp(), [])
         parser = command.get_parser("test")
         parsed_args = parser.parse_args([])
@@ -506,20 +504,6 @@ class TestCase(unittest.TestCase):
             ),
             mock.call(
                 mock.ANY,
-                [utils.get_data_files_path("ansible", "kolla-ansible.yml")],
-                tags="config",
-                ignore_limit=True,
-            ),
-            mock.call(
-                mock.ANY,
-                [
-                    utils.get_data_files_path("ansible", "kolla-host.yml"),
-                    utils.get_data_files_path("ansible", "docker.yml"),
-                ],
-                limit="seed",
-            ),
-            mock.call(
-                mock.ANY,
                 [
                     utils.get_data_files_path("ansible",
                                               "docker-registry.yml"),
@@ -530,19 +514,9 @@ class TestCase(unittest.TestCase):
         ]
         self.assertEqual(expected_calls, mock_run.call_args_list)
 
-        expected_calls = [
-            mock.call(
-                mock.ANY,
-                "bootstrap-servers",
-            ),
-        ]
-        self.assertEqual(expected_calls, mock_kolla_run.call_args_list)
-
     @mock.patch.object(commands.KayobeAnsibleMixin,
                        "run_kayobe_playbooks")
-    @mock.patch.object(commands.KollaAnsibleMixin,
-                       "run_kolla_ansible_seed")
-    def test_seed_host_configure_wipe_disks(self, mock_kolla_run, mock_run):
+    def test_seed_host_configure_wipe_disks(self, mock_run):
         command = commands.SeedHostConfigure(TestApp(), [])
         parser = command.get_parser("test")
         parsed_args = parser.parse_args(["--wipe-disks"])
@@ -567,20 +541,6 @@ class TestCase(unittest.TestCase):
             ),
             mock.call(
                 mock.ANY,
-                [utils.get_data_files_path("ansible", "kolla-ansible.yml")],
-                tags="config",
-                ignore_limit=True,
-            ),
-            mock.call(
-                mock.ANY,
-                [
-                    utils.get_data_files_path("ansible", "kolla-host.yml"),
-                    utils.get_data_files_path("ansible", "docker.yml"),
-                ],
-                limit="seed",
-            ),
-            mock.call(
-                mock.ANY,
                 [
                     utils.get_data_files_path("ansible",
                                               "docker-registry.yml"),
@@ -590,14 +550,6 @@ class TestCase(unittest.TestCase):
             ),
         ]
         self.assertEqual(expected_calls, mock_run.call_args_list)
-
-        expected_calls = [
-            mock.call(
-                mock.ANY,
-                "bootstrap-servers",
-            ),
-        ]
-        self.assertEqual(expected_calls, mock_kolla_run.call_args_list)
 
     @mock.patch.object(commands.KayobeAnsibleMixin,
                        "run_kayobe_playbooks")
@@ -1286,9 +1238,7 @@ class TestCase(unittest.TestCase):
 
     @mock.patch.object(commands.KayobeAnsibleMixin,
                        "run_kayobe_playbooks")
-    @mock.patch.object(commands.KollaAnsibleMixin,
-                       "run_kolla_ansible_overcloud")
-    def test_overcloud_host_configure(self, mock_kolla_run, mock_run):
+    def test_overcloud_host_configure(self, mock_run):
         command = commands.OvercloudHostConfigure(TestApp(), [])
         parser = command.get_parser("test")
         parsed_args = parser.parse_args([])
@@ -1310,39 +1260,12 @@ class TestCase(unittest.TestCase):
                 ],
                 limit="overcloud",
             ),
-            mock.call(
-                mock.ANY,
-                [utils.get_data_files_path("ansible", "kolla-ansible.yml")],
-                tags="config",
-                ignore_limit=True,
-            ),
-            mock.call(
-                mock.ANY,
-                [
-                    utils.get_data_files_path("ansible", "kolla-host.yml"),
-                    utils.get_data_files_path("ansible", "docker.yml"),
-                    utils.get_data_files_path(
-                        "ansible", "swift-block-devices.yml"),
-                ],
-                limit="overcloud",
-            ),
         ]
         self.assertEqual(expected_calls, mock_run.call_args_list)
 
-        expected_calls = [
-            mock.call(
-                mock.ANY,
-                "bootstrap-servers",
-            ),
-        ]
-        self.assertEqual(expected_calls, mock_kolla_run.call_args_list)
-
     @mock.patch.object(commands.KayobeAnsibleMixin,
                        "run_kayobe_playbooks")
-    @mock.patch.object(commands.KollaAnsibleMixin,
-                       "run_kolla_ansible_overcloud")
-    def test_overcloud_host_configure_wipe_disks(self, mock_kolla_run,
-                                                 mock_run):
+    def test_overcloud_host_configure_wipe_disks(self, mock_run):
         command = commands.OvercloudHostConfigure(TestApp(), [])
         parser = command.get_parser("test")
         parsed_args = parser.parse_args(["--wipe-disks"])
@@ -1365,32 +1288,8 @@ class TestCase(unittest.TestCase):
                 limit="overcloud",
                 extra_vars={"wipe_disks": True},
             ),
-            mock.call(
-                mock.ANY,
-                [utils.get_data_files_path("ansible", "kolla-ansible.yml")],
-                tags="config",
-                ignore_limit=True,
-            ),
-            mock.call(
-                mock.ANY,
-                [
-                    utils.get_data_files_path("ansible", "kolla-host.yml"),
-                    utils.get_data_files_path("ansible", "docker.yml"),
-                    utils.get_data_files_path(
-                        "ansible", "swift-block-devices.yml"),
-                ],
-                limit="overcloud",
-            ),
         ]
         self.assertEqual(expected_calls, mock_run.call_args_list)
-
-        expected_calls = [
-            mock.call(
-                mock.ANY,
-                "bootstrap-servers",
-            ),
-        ]
-        self.assertEqual(expected_calls, mock_kolla_run.call_args_list)
 
     @mock.patch.object(commands.KayobeAnsibleMixin,
                        "run_kayobe_playbooks")
