@@ -441,16 +441,12 @@ class SeedHypervisorHostConfigure(KollaAnsibleMixin, KayobeAnsibleMixin,
         self.run_kayobe_playbooks(parsed_args, playbooks,
                                   limit="seed-hypervisor")
 
-        playbooks = _build_playbook_list(
-            "ssh-known-host", "kayobe-ansible-user",
-            "apt", "dnf", "pip", "kayobe-target-venv")
+        kwargs = {}
         if parsed_args.wipe_disks:
-            playbooks += _build_playbook_list("wipe-disks")
-        playbooks += _build_playbook_list(
-            "users", "dev-tools", "network", "firewall", "tuned", "sysctl",
-            "time", "mdadm", "luks", "lvm", "seed-hypervisor-libvirt-host")
+            kwargs["extra_vars"] = {"wipe_disks": True}
+        playbooks = _build_playbook_list("seed-hypervisor-host-configure")
         self.run_kayobe_playbooks(parsed_args, playbooks,
-                                  limit="seed-hypervisor")
+                                  limit="seed-hypervisor", **kwargs)
 
 
 class SeedHypervisorHostPackageUpdate(KayobeAnsibleMixin, VaultMixin, Command):
@@ -597,17 +593,12 @@ class SeedHostConfigure(KollaAnsibleMixin, KayobeAnsibleMixin, VaultMixin,
         self.run_kayobe_playbooks(parsed_args, playbooks, limit="seed")
 
         # Run kayobe playbooks.
-        playbooks = _build_playbook_list(
-            "ssh-known-host", "kayobe-ansible-user",
-            "apt", "dnf", "pip", "kayobe-target-venv")
+        kwargs = {}
         if parsed_args.wipe_disks:
-            playbooks += _build_playbook_list("wipe-disks")
-        playbooks += _build_playbook_list(
-            "users", "dev-tools", "disable-selinux", "network", "firewall",
-            "tuned", "sysctl", "ip-routing", "snat", "disable-glean", "time",
-            "mdadm", "luks", "lvm", "docker-devicemapper",
-            "kolla-ansible-user", "kolla-pip", "kolla-target-venv")
-        self.run_kayobe_playbooks(parsed_args, playbooks, limit="seed")
+            kwargs["extra_vars"] = {"wipe_disks": True}
+        playbooks = _build_playbook_list("seed-host-configure")
+        self.run_kayobe_playbooks(parsed_args, playbooks, limit="seed",
+                                  **kwargs)
 
         self.generate_kolla_ansible_config(parsed_args, service_config=False)
 
@@ -903,16 +894,12 @@ class InfraVMHostConfigure(KayobeAnsibleMixin, VaultMixin,
         self.run_kayobe_playbooks(parsed_args, playbooks, limit="infra-vms")
 
         # Kayobe playbooks.
-        playbooks = _build_playbook_list(
-            "ssh-known-host", "kayobe-ansible-user",
-            "apt", "dnf", "pip", "kayobe-target-venv")
+        kwargs = {}
         if parsed_args.wipe_disks:
-            playbooks += _build_playbook_list("wipe-disks")
-        playbooks += _build_playbook_list(
-            "users", "dev-tools", "disable-selinux", "network", "firewall",
-            "tuned", "sysctl", "disable-glean", "disable-cloud-init", "time",
-            "mdadm", "luks", "lvm", "docker-devicemapper", "docker")
-        self.run_kayobe_playbooks(parsed_args, playbooks, limit="infra-vms")
+            kwargs["extra_vars"] = {"wipe_disks": True}
+        playbooks = _build_playbook_list("infra-vm-host-configure")
+        self.run_kayobe_playbooks(parsed_args, playbooks, limit="infra-vms",
+                                  **kwargs)
 
 
 class InfraVMHostPackageUpdate(KayobeAnsibleMixin, VaultMixin, Command):
@@ -1155,17 +1142,12 @@ class OvercloudHostConfigure(KollaAnsibleMixin, KayobeAnsibleMixin, VaultMixin,
         self.run_kayobe_playbooks(parsed_args, playbooks, limit="overcloud")
 
         # Kayobe playbooks.
-        playbooks = _build_playbook_list(
-            "ssh-known-host", "kayobe-ansible-user",
-            "apt", "dnf", "pip", "kayobe-target-venv")
+        kwargs = {}
         if parsed_args.wipe_disks:
-            playbooks += _build_playbook_list("wipe-disks")
-        playbooks += _build_playbook_list(
-            "users", "dev-tools", "disable-selinux", "network", "firewall",
-            "tuned", "sysctl", "disable-glean", "disable-cloud-init", "time",
-            "mdadm", "luks", "lvm", "docker-devicemapper",
-            "kolla-ansible-user", "kolla-pip", "kolla-target-venv")
-        self.run_kayobe_playbooks(parsed_args, playbooks, limit="overcloud")
+            kwargs["extra_vars"] = {"wipe_disks": True}
+        playbooks = _build_playbook_list("overcloud-host-configure")
+        self.run_kayobe_playbooks(parsed_args, playbooks, limit="overcloud",
+                                  **kwargs)
 
         self.generate_kolla_ansible_config(parsed_args, service_config=False)
 
