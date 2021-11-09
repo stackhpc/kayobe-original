@@ -718,9 +718,7 @@ class TestCase(unittest.TestCase):
                 mock.ANY,
                 [
                     utils.get_data_files_path(
-                        "ansible", "kayobe-target-venv.yml"),
-                    utils.get_data_files_path(
-                        "ansible", "kolla-target-venv.yml"),
+                        "ansible", "seed-host-upgrade.yml"),
                 ],
                 limit="seed",
             ),
@@ -1515,13 +1513,7 @@ class TestCase(unittest.TestCase):
                 mock.ANY,
                 [
                     utils.get_data_files_path(
-                        "ansible", "kayobe-target-venv.yml"),
-                    utils.get_data_files_path(
-                        "ansible", "kolla-target-venv.yml"),
-                    utils.get_data_files_path(
-                        "ansible", "overcloud-docker-sdk-upgrade.yml"),
-                    utils.get_data_files_path(
-                        "ansible", "overcloud-etc-hosts-fixup.yml"),
+                        "ansible", "overcloud-host-upgrade.yml"),
                 ],
                 limit="overcloud",
             ),

@@ -674,8 +674,7 @@ class SeedHostUpgrade(KollaAnsibleMixin, KayobeAnsibleMixin, VaultMixin,
 
     def take_action(self, parsed_args):
         self.app.LOG.debug("Upgrading seed host services")
-        playbooks = _build_playbook_list(
-            "kayobe-target-venv", "kolla-target-venv")
+        playbooks = _build_playbook_list("seed-host-upgrade")
         self.run_kayobe_playbooks(parsed_args, playbooks, limit="seed")
 
 
@@ -1217,9 +1216,7 @@ class OvercloudHostUpgrade(KollaAnsibleMixin, KayobeAnsibleMixin, VaultMixin,
 
     def take_action(self, parsed_args):
         self.app.LOG.debug("Upgrading overcloud host services")
-        playbooks = _build_playbook_list(
-            "kayobe-target-venv", "kolla-target-venv",
-            "overcloud-docker-sdk-upgrade", "overcloud-etc-hosts-fixup")
+        playbooks = _build_playbook_list("overcloud-host-upgrade")
         self.run_kayobe_playbooks(parsed_args, playbooks, limit="overcloud")
 
         # TODO(mgoddard): Remove this in Y cycle after Kolla Ansible chrony
