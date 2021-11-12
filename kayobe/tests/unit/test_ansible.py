@@ -43,6 +43,7 @@ class TestCase(unittest.TestCase):
         ansible.run_playbooks(parsed_args, ["playbook1.yml", "playbook2.yml"])
         expected_cmd = [
             "ansible-playbook",
+            "--inventory", utils.get_data_files_path("ansible", "inventory"),
             "--inventory", "/etc/kayobe/inventory",
             "-e", "@/etc/kayobe/vars-file1.yml",
             "-e", "@/etc/kayobe/vars-file2.yaml",
@@ -83,6 +84,7 @@ class TestCase(unittest.TestCase):
             "ansible-playbook",
             "-vv",
             "--list-tasks",
+            "--inventory", utils.get_data_files_path("ansible", "inventory"),
             "--inventory", "/path/to/inventory",
             "-e", "@/path/to/config/vars-file1.yml",
             "-e", "@/path/to/config/vars-file2.yaml",
@@ -135,6 +137,7 @@ class TestCase(unittest.TestCase):
             "ansible-playbook",
             "--list-tasks",
             "--vault-password-file", "/path/to/kayobe-vault-password-helper",
+            "--inventory", utils.get_data_files_path("ansible", "inventory"),
             "--inventory", "/path/to/inventory",
             "-e", "@/path/to/config/vars-file1.yml",
             "-e", "@/path/to/config/vars-file2.yaml",
@@ -180,6 +183,7 @@ class TestCase(unittest.TestCase):
         expected_cmd = [
             "ansible-playbook",
             "--vault-password-file", "/path/to/vault/pw",
+            "--inventory", utils.get_data_files_path("ansible", "inventory"),
             "--inventory", "/etc/kayobe/inventory",
             "playbook1.yml",
         ]
@@ -209,6 +213,7 @@ class TestCase(unittest.TestCase):
         expected_cmd = [
             "ansible-playbook",
             "--vault-password-file", "/path/to/kayobe-vault-password-helper",
+            "--inventory", utils.get_data_files_path("ansible", "inventory"),
             "--inventory", "/etc/kayobe/inventory",
             "playbook1.yml",
         ]
@@ -259,6 +264,7 @@ class TestCase(unittest.TestCase):
                               **kwargs)
         expected_cmd = [
             "ansible-playbook",
+            "--inventory", utils.get_data_files_path("ansible", "inventory"),
             "--inventory", "/etc/kayobe/inventory",
             "-e", "@/etc/kayobe/vars-file1.yml",
             "-e", "@/etc/kayobe/vars-file2.yaml",
@@ -294,6 +300,7 @@ class TestCase(unittest.TestCase):
                               limit="foo", ignore_limit=True)
         expected_cmd = [
             "ansible-playbook",
+            "--inventory", utils.get_data_files_path("ansible", "inventory"),
             "--inventory", "/etc/kayobe/inventory",
             "-e", "@/etc/kayobe/vars-file1.yml",
             "-e", "@/etc/kayobe/vars-file2.yaml",
@@ -325,6 +332,7 @@ class TestCase(unittest.TestCase):
                               **kwargs)
         expected_cmd = [
             "ansible-playbook",
+            "--inventory", utils.get_data_files_path("ansible", "inventory"),
             "--inventory", "/etc/kayobe/inventory",
             "playbook1.yml",
             "playbook2.yml",
@@ -349,6 +357,7 @@ class TestCase(unittest.TestCase):
         ansible.run_playbooks(parsed_args, ["playbook1.yml"])
         expected_cmd = [
             "ansible-playbook",
+            "--inventory", utils.get_data_files_path("ansible", "inventory"),
             "--inventory", "/etc/kayobe/inventory",
             "playbook1.yml",
         ]
@@ -377,6 +386,7 @@ class TestCase(unittest.TestCase):
         ansible.run_playbooks(parsed_args, ["playbook1.yml"])
         expected_cmd = [
             "ansible-playbook",
+            "--inventory", utils.get_data_files_path("ansible", "inventory"),
             "--inventory", "/etc/kayobe/inventory",
             "playbook1.yml",
         ]
@@ -671,6 +681,7 @@ class TestCase(unittest.TestCase):
         ansible.run_playbooks(parsed_args, ["playbook1.yml", "playbook2.yml"])
         expected_cmd = [
             "ansible-playbook",
+            "--inventory", utils.get_data_files_path("ansible", "inventory"),
             "--inventory", "/etc/kayobe/inventory",
             "--inventory", "/etc/kayobe/environments/foobar/inventory",
             "playbook1.yml",
@@ -703,6 +714,7 @@ class TestCase(unittest.TestCase):
         ansible.run_playbooks(parsed_args, ["playbook1.yml", "playbook2.yml"])
         expected_cmd = [
             "ansible-playbook",
+            "--inventory", utils.get_data_files_path("ansible", "inventory"),
             "--inventory", "/etc/kayobe/inventory",
             "--inventory", "/etc/kayobe/environments/test-env/inventory",
             "playbook1.yml",
@@ -743,6 +755,7 @@ class TestCase(unittest.TestCase):
         ansible.run_playbooks(parsed_args, ["playbook1.yml", "playbook2.yml"])
         expected_cmd = [
             "ansible-playbook",
+            "--inventory", utils.get_data_files_path("ansible", "inventory"),
             "--inventory", "/etc/kayobe/inventory",
             "playbook1.yml",
             "playbook2.yml",
@@ -782,6 +795,7 @@ class TestCase(unittest.TestCase):
         ansible.run_playbooks(parsed_args, ["playbook1.yml", "playbook2.yml"])
         expected_cmd = [
             "ansible-playbook",
+            "--inventory", utils.get_data_files_path("ansible", "inventory"),
             "--inventory", "/etc/kayobe/environments/test-env/inventory",
             "playbook1.yml",
             "playbook2.yml",
