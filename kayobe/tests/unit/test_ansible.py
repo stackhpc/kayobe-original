@@ -27,6 +27,9 @@ from kayobe import utils
 from kayobe import vault
 
 
+# TODO: Mock or calculate environment.
+
+
 @mock.patch.dict(os.environ, clear=True)
 class TestCase(unittest.TestCase):
 
@@ -196,10 +199,13 @@ class TestCase(unittest.TestCase):
                      clear=True)
     @mock.patch.object(utils, "run_command")
     @mock.patch.object(ansible, "_get_vars_files")
+    @mock.patch.object(ansible, "_get_environment")
     @mock.patch.object(ansible, "_validate_args")
     def test_run_playbooks_vault_password_helper(self, mock_validate,
-                                                 mock_vars, mock_run):
+                                                 mock_env, mock_vars,
+                                                 mock_run):
         mock_vars.return_value = []
+        mock_env.return_value = {}
         parser = argparse.ArgumentParser()
         mock_run.return_value = "/path/to/kayobe-vault-password-helper"
         ansible.add_args(parser)
@@ -217,10 +223,8 @@ class TestCase(unittest.TestCase):
             "--inventory", "/etc/kayobe/inventory",
             "playbook1.yml",
         ]
-        expected_env = {"KAYOBE_CONFIG_PATH": "/etc/kayobe",
-                        "KAYOBE_VAULT_PASSWORD": "test-pass"}
         mock_run.assert_called_once_with(expected_cmd, check_output=False,
-                                         quiet=False, env=expected_env)
+                                         quiet=False, env={})
 
     @mock.patch.object(utils, "run_command")
     @mock.patch.object(ansible, "_get_vars_files")
@@ -239,10 +243,13 @@ class TestCase(unittest.TestCase):
 
     @mock.patch.object(utils, "run_command")
     @mock.patch.object(ansible, "_get_vars_files")
+    @mock.patch.object(ansible, "_get_environment")
     @mock.patch.object(ansible, "_validate_args")
-    def test_run_playbooks_func_args(self, mock_validate, mock_vars, mock_run):
+    def test_run_playbooks_func_args(self, mock_validate, mock_env, mock_vars,
+                                     mock_run):
         mock_vars.return_value = ["/etc/kayobe/vars-file1.yml",
                                   "/etc/kayobe/vars-file2.yaml"]
+        mock_env.return_value = {"FOO": "bar"}
         parser = argparse.ArgumentParser()
         ansible.add_args(parser)
         vault.add_args(parser)
@@ -277,18 +284,20 @@ class TestCase(unittest.TestCase):
             "playbook1.yml",
             "playbook2.yml",
         ]
-        expected_env = {"KAYOBE_CONFIG_PATH": "/etc/kayobe"}
+        expected_env = {"FOO": "bar"}
         mock_run.assert_called_once_with(expected_cmd, check_output=False,
                                          quiet=False, env=expected_env)
         mock_vars.assert_called_once_with(["/etc/kayobe"])
 
     @mock.patch.object(utils, "run_command")
     @mock.patch.object(ansible, "_get_vars_files")
+    @mock.patch.object(ansible, "_get_environment")
     @mock.patch.object(ansible, "_validate_args")
-    def test_run_playbooks_ignore_limit(self, mock_validate, mock_vars,
-                                        mock_run):
+    def test_run_playbooks_ignore_limit(self, mock_validate, mock_env,
+                                        mock_vars, mock_run):
         mock_vars.return_value = ["/etc/kayobe/vars-file1.yml",
                                   "/etc/kayobe/vars-file2.yaml"]
+        mock_env.return_value = {}
         parser = argparse.ArgumentParser()
         ansible.add_args(parser)
         vault.add_args(parser)
@@ -307,13 +316,14 @@ class TestCase(unittest.TestCase):
             "playbook1.yml",
             "playbook2.yml",
         ]
-        expected_env = {"KAYOBE_CONFIG_PATH": "/etc/kayobe"}
+        expected_env = {}
         mock_run.assert_called_once_with(expected_cmd, check_output=False,
                                          quiet=False, env=expected_env)
         mock_vars.assert_called_once_with(["/etc/kayobe"])
 
     @mock.patch.object(utils, "run_command")
     @mock.patch.object(ansible, "_get_vars_files")
+    @mock.patch.object(ansible, "_get_environment")
     @mock.patch.object(ansible, "_validate_args")
     def test_run_playbooks_list_tasks_arg(self, mock_validate, mock_vars,
                                           mock_run):
@@ -345,6 +355,7 @@ class TestCase(unittest.TestCase):
     @mock.patch.object(utils, "run_command")
     @mock.patch.object(utils, "is_readable_file")
     @mock.patch.object(ansible, "_get_vars_files")
+    @mock.patch.object(ansible, "_get_environment")
     @mock.patch.object(ansible, "_validate_args")
     def test_run_playbooks_ansible_cfg(self, mock_validate, mock_vars,
                                        mock_readable, mock_run):
@@ -373,6 +384,7 @@ class TestCase(unittest.TestCase):
     @mock.patch.object(utils, "run_command")
     @mock.patch.object(utils, "is_readable_file")
     @mock.patch.object(ansible, "_get_vars_files")
+    @mock.patch.object(ansible, "_get_environment")
     @mock.patch.object(ansible, "_validate_args")
     def test_run_playbooks_ansible_cfg_env(self, mock_validate, mock_vars,
                                            mock_readable, mock_run):
@@ -667,6 +679,7 @@ class TestCase(unittest.TestCase):
 
     @mock.patch.object(utils, "run_command")
     @mock.patch.object(ansible, "_get_vars_files")
+    @mock.patch.object(ansible, "_get_environment")
     @mock.patch.object(ansible, "_validate_args")
     def test_multiple_inventory_args(self, mock_validate, mock_vars, mock_run):
         mock_vars.return_value = []
@@ -695,6 +708,7 @@ class TestCase(unittest.TestCase):
     @mock.patch.object(os.path, "exists")
     @mock.patch.object(utils, "run_command")
     @mock.patch.object(ansible, "_get_vars_files")
+    @mock.patch.object(ansible, "_get_environment")
     @mock.patch.object(ansible, "_validate_args")
     def test_multiple_inventories(self, mock_validate, mock_vars, mock_run,
                                   mock_exists):
@@ -736,6 +750,7 @@ class TestCase(unittest.TestCase):
     @mock.patch.object(os.path, "exists")
     @mock.patch.object(utils, "run_command")
     @mock.patch.object(ansible, "_get_vars_files")
+    @mock.patch.object(ansible, "_get_environment")
     @mock.patch.object(ansible, "_validate_args")
     def test_shared_inventory_only(self, mock_validate, mock_vars, mock_run,
                                    mock_exists):
@@ -776,10 +791,12 @@ class TestCase(unittest.TestCase):
     @mock.patch.object(os.path, "exists")
     @mock.patch.object(utils, "run_command")
     @mock.patch.object(ansible, "_get_vars_files")
+    @mock.patch.object(ansible, "_get_environment")
     @mock.patch.object(ansible, "_validate_args")
-    def test_env_inventory_only(self, mock_validate, mock_vars, mock_run,
-                                mock_exists):
+    def test_env_inventory_only(self, mock_validate, mock_env, mock_vars,
+                                mock_run, mock_exists):
         mock_vars.return_value = []
+        mock_env.return_value = {}
         # os.path.exists gets called three times:
         # 1) shared inventory
         # 2) environment inventory
@@ -800,8 +817,7 @@ class TestCase(unittest.TestCase):
             "playbook1.yml",
             "playbook2.yml",
         ]
-        expected_env = {"KAYOBE_CONFIG_PATH": "/etc/kayobe",
-                        "KAYOBE_ENVIRONMENT": "test-env"}
+        expected_env = {}
         expected_calls = [
             mock.call("/etc/kayobe/inventory"),
             mock.call("/etc/kayobe/environments/test-env/inventory"),

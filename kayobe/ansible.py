@@ -228,6 +228,37 @@ def _get_environment(parsed_args):
     ansible_cfg_path = os.path.join(parsed_args.config_path, "ansible.cfg")
     if utils.is_readable_file(ansible_cfg_path)["result"]:
         env.setdefault("ANSIBLE_CONFIG", ansible_cfg_path)
+    # FIXME: check for options in ansible.cfg.
+    roles_paths = [
+        os.path.join(parsed_args.config_path, "ansible", "roles"),
+        utils.get_data_files_path("ansible", "roles"),
+        "~/.ansible/roles",
+        "/usr/share/ansible/roles",
+        "/etc/ansible/roles",
+    ]
+    # TODO: action plugins?
+    env.setdefault("ANSIBLE_ROLES_PATH", ":".join(roles_paths))
+    collections_paths = [
+        os.path.join(parsed_args.config_path, "ansible", "collections"),
+        utils.get_data_files_path("ansible", "collections"),
+        "~/.ansible/collections",
+        "/usr/share/ansible/collections"
+    ]
+    env.setdefault("ANSIBLE_COLLECTIONS_PATH", ":".join(collections_paths))
+    filter_plugins = [
+        os.path.join(parsed_args.config_path, "ansible", "filter_plugins"),
+        utils.get_data_files_path("ansible", "filter_plugins"),
+        "~/.ansible/plugins/filter",
+        "/usr/share/ansible/plugins/filter",
+    ]
+    env.setdefault("ANSIBLE_FILTER_PLUGINS", ":".join(filter_plugins))
+    test_plugins = [
+        os.path.join(parsed_args.config_path, "ansible", "test_plugins"),
+        utils.get_data_files_path("ansible", "test_plugins"),
+        "~/.ansible/plugins/test",
+        "/usr/share/ansible/plugins/test",
+    ]
+    env.setdefault("ANSIBLE_TEST_PLUGINS", ":".join(test_plugins))
     return env
 
 
