@@ -20,7 +20,6 @@
         docker_registry: "{{ kolla_docker_registry }}"
         docker_namespace: "{{ kolla_docker_namespace }}"
         docker_registry_username: "{{ kolla_docker_registry_username }}"
-        docker_storage_driver: "{{ docker_storage_driver }}"
         docker_custom_config: "{{ lookup('template', 'roles/kolla-ansible/templates/daemon.json.j2') | to_nice_json | indent(2) }}"
         docker_registry_insecure: "{{ kolla_docker_registry_insecure | bool }}"
         # User account to use for Kolla SSH access.
