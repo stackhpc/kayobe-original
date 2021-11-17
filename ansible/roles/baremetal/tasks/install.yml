@@ -1,10 +1,4 @@
 ---
-- name: Update apt cache
-  apt:
-    update_cache: yes
-  become: True
-  when: ansible_facts.os_family == 'Debian'
-
 # Upgrading docker engine may cause containers to stop. Take a snapshot of the
 # running containers prior to a potential upgrade of Docker.
 
@@ -39,6 +33,8 @@
 - name: Install apt packages
   package:
     name: "{{ (debian_pkg_install | join(' ')).split() }}"
+    cache_valid_time: "{{ apt_cache_valid_time if ansible_facts.os_family == 'Debian' else omit }}"
+    update_cache: "{{ True if ansible_facts.os_family == 'Debian' else omit }}"
     state: present
   become: True
   when: ansible_facts.os_family == 'Debian'
