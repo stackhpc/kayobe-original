@@ -1,11 +1,4 @@
 ---
-- name: Add public key to kolla user authorized keys
-  authorized_key:
-    user: "{{ kolla_user }}"
-    key: "{{ kolla_ssh_key.public_key }}"
-  become: True
-  when: create_kolla_user | bool
-
 - name: Ensure node_config_directory directory exists for user kolla
   file:
     path: "{{ node_config_directory }}"

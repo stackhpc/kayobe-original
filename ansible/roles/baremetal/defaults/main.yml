@@ -18,9 +18,6 @@ docker_yum_package: "docker-ce"
 
 customize_etc_hosts: True
 
-create_kolla_user: True
-create_kolla_user_sudoers: "{{ create_kolla_user }}"
-
 kolla_user: "kolla"
 kolla_group: "kolla"
 

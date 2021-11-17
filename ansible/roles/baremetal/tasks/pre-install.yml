@@ -61,19 +61,6 @@
   become: True
   when: customize_etc_hosts | bool
 
-- name: Ensure sudo group is present
-  group:
-    name: sudo
-    state: present
-  become: True
-
-- name: Ensure kolla group is present
-  group:
-    name: "{{ kolla_group }}"
-    state: present
-  become: True
-  when: create_kolla_user | bool
-
 - block:
     - block:
         - name: Install apt packages

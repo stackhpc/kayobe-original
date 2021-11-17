@@ -13,9 +13,6 @@
         docker_registry_insecure: "{{ kolla_docker_registry_insecure | bool }}"
         install_epel: "{{ kolla_ansible_install_epel | bool }}"
         enable_host_ntp: false
-        # Kayobe performs creation of the Kolla Ansible user account, so there is no
-        # need for Kolla Ansible to repeat this.
-        create_kolla_user: false
         # User account to use for Kolla SSH access.
         kolla_user: "{{ kolla_ansible_user }}"
         # Primary group of Kolla SSH user.
