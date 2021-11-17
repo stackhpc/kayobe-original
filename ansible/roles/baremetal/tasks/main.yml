@@ -1,4 +1,7 @@
 ---
+- include_tasks: etc-hosts.yml
+  when: customize_etc_hosts | bool
+
 - import_tasks: pre-install.yml
 
 - import_tasks: install.yml
