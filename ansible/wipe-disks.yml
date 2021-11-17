@@ -12,13 +12,13 @@
   tags:
     - wipe-disks
   tasks:
-    block:
-      - name: Teardown unmounted LUKS devices
-        include_role:
-          name: stackhpc.luks
-        vars:
-          luks_action: teardown-unmounted
-      - name: Wipe disks
-        include_role:
-          name: wipe-disks
-    when: wipe_disks | default(false) | bool
+    - block:
+        - name: Teardown unmounted LUKS devices
+          include_role:
+            name: stackhpc.luks
+          vars:
+            luks_action: teardown-unmounted
+        - name: Wipe disks
+          include_role:
+            name: wipe-disks
+      when: wipe_disks | default(false) | bool
