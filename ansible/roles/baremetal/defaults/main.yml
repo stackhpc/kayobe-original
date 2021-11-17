@@ -66,3 +66,5 @@ docker_log_max_size: "50m"
 docker_disable_default_iptables_rules: "yes"
 docker_disable_default_network: "{{ docker_disable_default_iptables_rules }}"
 docker_disable_ip_forward: "{{ docker_disable_default_iptables_rules }}"
+
+node_config_directory: "/etc/kolla"
