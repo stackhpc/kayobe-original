@@ -11,7 +11,6 @@
         docker_storage_driver: "{{ docker_storage_driver }}"
         docker_custom_config: "{{ lookup('template', 'roles/kolla-ansible/templates/daemon.json.j2') | to_nice_json | indent(2) }}"
         docker_registry_insecure: "{{ kolla_docker_registry_insecure | bool }}"
-        enable_host_ntp: false
         # User account to use for Kolla SSH access.
         kolla_user: "{{ kolla_ansible_user }}"
         # Primary group of Kolla SSH user.
