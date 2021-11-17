@@ -5,71 +5,31 @@
     state: directory
   become: True
 
-- name: Setup docker insecure registries
-  vars:
-    registries: ["{{ docker_registry }}"]
-  set_fact:
-    docker_config: "{{ docker_config | combine({'insecure-registries': registries}) }}"
-  when: docker_registry_insecure | bool
-
-- name: Setup docker storage driver
-  set_fact:
-    docker_config: "{{ docker_config | combine({'storage-driver': docker_storage_driver}) }}"
-  when: docker_storage_driver | length > 0
-
-- name: Setup docker runtime directory
-  set_fact:
-    docker_config: "{{ docker_config | combine({'data-root': docker_runtime_directory}) }}"
-  when: docker_runtime_directory | length > 0
-
-- name: Warn about docker default iptables
-  debug:
-    msg: >-
-      Docker default iptables rules will be disabled by default from the Wallaby 12.0.0
-      release. If you have any non-Kolla containers that need this functionality, you should
-      plan a migration for this change, or set docker_disable_default_iptables_rules to false.
-  when: not docker_disable_default_iptables_rules | bool
-
-- name: Disable docker default iptables rules
-  set_fact:
-    docker_config: "{{ docker_config | combine({'iptables': false}) }}"
-  when: docker_disable_default_iptables_rules | bool
-
-- name: Warn about docker default networking
-  debug:
-    msg: >-
-      Docker default network on docker0 will be disabled by default from the
-      Wallaby 12.0.0 release. If you have any non-Kolla containers that need
-      this functionality, you should plan a migration for this change, or set
-      docker_disable_default_network to false.
-  when: not docker_disable_default_network | bool
-
-- name: Disable docker default network on docker0
-  set_fact:
-    docker_config: "{{ docker_config | combine({'bridge': 'none'}) }}"
-  when: docker_disable_default_network | bool
-
-- name: Warn about docker ip_forward
-  debug:
-    msg: >-
-      Docker ip_forward will be disabled by default from the
-      Wallaby 12.0.0 release. If you have any non-Kolla containers that need
-      this functionality, you should plan a migration for this change, or set
-      docker_disable_ip_forward to false.
-  when: not docker_disable_ip_forward | bool
-
-- name: Disable docker ip_forward
-  set_fact:
-    docker_config: "{{ docker_config | combine({'ip-forward': false}) }}"
-  when: docker_disable_ip_forward | bool
-
-- name: Merge custom docker config
-  set_fact:
-    docker_config: "{{ docker_config | combine(docker_custom_config) }}"
-
 - name: Write docker config
   become: True
   copy:
+    docker_config_insecure_registries:
+      insecure-registries:
+        - "{{ docker_registry }}"
+    docker_config_storage_driver:
+      storage-driver: "{{ docker_storage_driver }}"
+    docker_config_runtime_directory:
+      data-root: "{{ docker_runtime_directory }}"
+    docker_config_iptables:
+      iptables: false
+    docker_config_bridge:
+      bridge: "none"
+    docker_config_ip_forward:
+      ip-forward: false
+    docker_config: >-
+      {{ {}
+         | combine(docker_config_insecure_registries if docker_registry_insecure | bool else {})
+         | combine(docker_config_storage_driver if docker_storage_driver | length > 0 else {})
+         | combine(docker_config_runtime_directory if docker_runtime_directory | length > 0 else {})
+         | combine(docker_config_iptables if docker_disable_default_iptables_rules | bool else {})
+         | combine(docker_config_bridge if docker_disable_default_network | bool else {})
+         | combine(docker_config_ip_forward if docker_disable_ip_forward | bool else {})
+         | combine(docker_custom_config) }}
     content: "{{ docker_config | to_nice_json }}"
     dest: /etc/docker/daemon.json
     mode: 0644
