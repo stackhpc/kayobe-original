@@ -1,31 +1,10 @@
 ---
-- name: Create kolla user
-  user:
-    name: "{{ kolla_user }}"
-    state: present
-    group: "{{ kolla_group }}"
-    groups: "sudo"
-    append: true
-  become: True
-  when: create_kolla_user | bool
-
 - name: Add public key to kolla user authorized keys
   authorized_key:
     user: "{{ kolla_user }}"
     key: "{{ kolla_ssh_key.public_key }}"
   become: True
   when: create_kolla_user | bool
-
-- name: Grant kolla user passwordless sudo
-  lineinfile:
-    dest: /etc/sudoers.d/kolla-ansible-users
-    state: present
-    create: yes
-    mode: '0640'
-    regexp: '^{{ kolla_user }}'
-    line: '{{ kolla_user }} ALL=(ALL) NOPASSWD: ALL'
-  become: True
-  when: create_kolla_user_sudoers | bool
 
 - name: Ensure virtualenv has correct ownership
   file:
@@ -45,15 +24,6 @@
     group: "{{ kolla_group }}"
     mode: 0755
   become: True
-  when: create_kolla_user | bool
-
-- name: Ensure node_config_directory directory exists
-  file:
-    path: "{{ node_config_directory }}"
-    state: directory
-    mode: 0755
-  become: True
-  when: not create_kolla_user | bool
 
 - name: Ensure docker config directory exists
   file:
@@ -197,19 +167,6 @@
     - ansible_facts.distribution == "Ubuntu"
     - apparmor_libvirtd_profile.stat.exists
     - not apparmor_libvirtd_disable_profile.stat.exists
-
-- name: Create docker group
-  group:
-    name: docker
-  become: True
-
-- name: Add kolla user to docker group
-  user:
-    name: "{{ kolla_user }}"
-    append: yes
-    groups: docker
-  become: True
-  when: create_kolla_user | bool
 
 - name: Start docker
   systemd:
