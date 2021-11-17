@@ -12,7 +12,8 @@
   max_fail_percentage: >-
     {{ kayobe_ansible_user_max_fail_percentage |
        default(host_configure_max_fail_percentage) |
-       default(kayobe_max_fail_percentage) }}
+       default(kayobe_max_fail_percentage) |
+       default(100) }}
   tags:
     - kayobe-ansible-user
   tasks:
@@ -46,7 +47,8 @@
   max_fail_percentage: >-
     {{ kayobe_ansible_user_max_fail_percentage |
        default(host_configure_max_fail_percentage) |
-       default(kayobe_max_fail_percentage) }}
+       default(kayobe_max_fail_percentage) |
+       default(100) }}
   vars:
     ansible_user: "{{ bootstrap_user }}"
     # We can't assume that a virtualenv exists at this point, so use the system
@@ -91,6 +93,11 @@
 - name: Verify that the Kayobe Ansible user account is accessible
   hosts: seed-hypervisor:seed:overcloud
   gather_facts: false
+  max_fail_percentage: >-
+    {{ kayobe_ansible_user_max_fail_percentage |
+       default(host_configure_max_fail_percentage) |
+       default(kayobe_max_fail_percentage) |
+       default(100) }}
   tags:
     - kayobe-ansible-user
   vars:
