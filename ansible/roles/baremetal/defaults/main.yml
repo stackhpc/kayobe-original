@@ -32,9 +32,6 @@ docker_http_proxy: ""
 docker_https_proxy: ""
 docker_no_proxy: ""
 
-# Version of python used to execute Ansible modules.
-host_python_version: "{{ ansible_facts.python.version.major }}.{{ ansible_facts.python.version.minor }}"
-
 debian_pkg_install:
  - "{{ docker_apt_package }}"
  - git
