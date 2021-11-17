@@ -40,7 +40,7 @@ debian_pkg_install:
  - git
  - "python3-setuptools"
  - "python3-pip"
- - "{% if enable_multipathd|bool %}sg3-utils-udev{% endif %}"
+ - "{% if kolla_enable_multipathd|bool %}sg3-utils-udev{% endif %}"
  - "{% if not docker_disable_default_iptables_rules | bool %}iptables{% endif %}"
 
 redhat_pkg_install:
