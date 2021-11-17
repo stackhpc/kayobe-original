@@ -3,8 +3,18 @@
   hosts: seed:overcloud
   tags:
     - baremetal
+  vars:
+    # kolla_overcloud_inventory_top_level_group_map looks like:
+    # kolla_overcloud_inventory_top_level_group_map:
+    #  control:
+    #    groups:
+    #      - controllers
+    hosts_in_kolla_inventory: >-
+      {{ kolla_overcloud_inventory_top_level_group_map.values() |
+         map(attribute='groups') | flatten | unique | union(['seed']) | join(':') }}
   tasks:
-    - import_role:
+    - name: Include baremetal role
+      include_role:
         name: baremetal
       vars:
         docker_registry: "{{ kolla_docker_registry }}"
@@ -19,3 +29,5 @@
         kolla_group: "{{ kolla_ansible_group }}"
         # Avoid disabling the firewall on CentOS, since we manage it in Kayobe.
         disable_firewall: "{{ ansible_facts.os_family == 'Debian' }}"
+      when:
+        - inventory_hostname in query('inventory_hostnames', hosts_in_kolla_inventory)
