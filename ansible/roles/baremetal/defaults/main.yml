@@ -24,10 +24,6 @@ create_kolla_user_sudoers: "{{ create_kolla_user }}"
 kolla_user: "kolla"
 kolla_group: "kolla"
 
-change_selinux: True
-
-selinux_state: "permissive"
-
 # If true, the host firewall service (firewalld or ufw) will be disabled.
 disable_firewall: True
 

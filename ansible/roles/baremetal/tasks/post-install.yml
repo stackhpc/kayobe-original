@@ -232,12 +232,3 @@
     enabled: yes
     masked: no
   become: True
-
-- name: Change state of selinux
-  selinux:
-    policy: targeted
-    state: "{{ selinux_state }}"
-  become: true
-  when:
-    - change_selinux | bool
-    - ansible_facts.os_family == "RedHat"

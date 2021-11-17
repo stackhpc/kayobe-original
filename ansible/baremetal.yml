@@ -11,7 +11,6 @@
         docker_storage_driver: "{{ docker_storage_driver }}"
         docker_custom_config: "{{ lookup('template', 'roles/kolla-ansible/templates/daemon.json.j2') | to_nice_json | indent(2) }}"
         docker_registry_insecure: "{{ kolla_docker_registry_insecure | bool }}"
-        selinux_state: disabled
         install_epel: "{{ kolla_ansible_install_epel | bool }}"
         enable_host_ntp: false
         # Kayobe performs creation of the Kolla Ansible user account, so there is no
