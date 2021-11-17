@@ -2,7 +2,8 @@
 - include_tasks: etc-hosts.yml
   when: customize_etc_hosts | bool
 
-- import_tasks: pre-install.yml
+- include_tasks: "docker-repo-{{ ansible_facts.os_family }}.yml"
+  when: enable_docker_repo | bool
 
 - import_tasks: install.yml
 

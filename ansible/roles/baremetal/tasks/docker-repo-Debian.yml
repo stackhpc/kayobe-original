@@ -1,0 +1,34 @@
+---
+- name: Install apt packages
+  apt:
+    update_cache: yes
+  become: True
+
+- name: Install CA certificates and gnupg packages
+  package:
+    name: "{{ item }}"
+    state: latest
+  become: True
+  with_items:
+    - ca-certificates
+    - gnupg
+
+- name: Ensure apt sources list directory exists
+  file:
+    path: /etc/apt/sources.list.d
+    state: directory
+    recurse: yes
+  become: True
+
+- name: Install docker apt gpg key
+  apt_key:
+    url: "{{ docker_apt_url }}/{{ docker_apt_key_file }}"
+    id: "{{ docker_apt_key_id }}"
+    state: present
+  become: True
+
+- name: Enable docker apt repository
+  apt_repository:
+    repo: "{{ docker_apt_repo }}"
+    filename: docker
+  become: True
