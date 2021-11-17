@@ -27,19 +27,18 @@
     dest: /etc/hosts
     marker: "# {mark} ANSIBLE GENERATED HOSTS"
     block: |
-        {% for host in groups['baremetal'] %}
-        {% set api_interface = hostvars[host]['api_interface'] %}
-        {% if host not in groups['bifrost'] or api_interface in hostvars[host].ansible_facts %}
+        {% for host in groups['overcloud'] %}
+        {% if host not in groups['seed'] or hostvars[host].internal_net_name in hostvars[host].network_interfaces %}
         {% set hostnames = [hostvars[host].ansible_facts.nodename, hostvars[host].ansible_facts.hostname] %}
-        {{ 'api' | kolla_address(host) }} {{ hostnames | unique | join(' ') }}
+        {{ hostvars[host].internal_net_name | net_ip(inventory_hostname=host) }} {{ hostnames | unique | join(' ') }}
         {% endif %}
         {% endfor %}
   become: True
   when:
     - customize_etc_hosts | bool
-    # Skip hosts in the bifrost group that do not have a valid api_interface.
-    - inventory_hostname not in groups['bifrost'] or
-      hostvars[inventory_hostname]['api_interface'] | replace('-', '_') in hostvars[inventory_hostname].ansible_facts
+    # Skip hosts in the seed group that do not have a valid api_interface.
+    - inventory_hostname not in groups['seed'] or
+      hostvars[host].internal_net_name in hostvars[host].network_interfaces
 
 # NOTE(osmanlicilegi): The distribution might come with cloud-init installed, and manage_etc_hosts
 # configuration enabled. If so, it will override the file /etc/hosts from cloud-init templates at
