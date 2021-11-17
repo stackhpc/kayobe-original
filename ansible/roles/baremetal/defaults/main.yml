@@ -21,9 +21,6 @@ customize_etc_hosts: True
 kolla_user: "kolla"
 kolla_group: "kolla"
 
-# If true, the host firewall service (firewalld or ufw) will be disabled.
-disable_firewall: True
-
 docker_storage_driver: ""
 docker_custom_option: ""
 docker_custom_config: {}
