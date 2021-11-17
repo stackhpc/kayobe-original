@@ -20,9 +20,10 @@
         docker_registry: "{{ kolla_docker_registry }}"
         docker_namespace: "{{ kolla_docker_namespace }}"
         docker_registry_username: "{{ kolla_docker_registry_username }}"
-        docker_custom_config: "{{ lookup('template', 'roles/kolla-ansible/templates/daemon.json.j2') | to_nice_json | indent(2) }}"
         docker_registry_insecure: "{{ kolla_docker_registry_insecure | bool }}"
         docker_registry_mirrors: []
+        docker_custom_config: "{{ lookup('template', 'roles/kolla-ansible/templates/daemon.json.j2') | to_nice_json | indent(2) }}"
+        docker_daemon_mtu: "{{ public_net_name | net_mtu | default }}"
         # User account to use for Kolla SSH access.
         kolla_user: "{{ kolla_ansible_user }}"
         # Primary group of Kolla SSH user.
