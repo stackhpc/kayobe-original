@@ -1,6 +1,8 @@
 ---
 - name: Ensure Kolla Ansible baremetal role
   hosts: seed:overcloud
+  tags:
+    - baremetal
   tasks:
     - import_role:
         name: baremetal
