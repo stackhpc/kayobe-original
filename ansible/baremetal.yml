@@ -4,3 +4,23 @@
   tasks:
     - import_role:
         name: baremetal
+      vars:
+        docker_registry: "{{ kolla_docker_registry }}"
+        docker_namespace: "{{ kolla_docker_namespace }}"
+        docker_registry_username: "{{ kolla_docker_registry_username }}"
+        docker_storage_driver: "{{ docker_storage_driver }}"
+        docker_custom_config: "{{ lookup('template', 'roles/kolla-ansible/templates/daemon.json.j2') | to_nice_json | indent(2) }}"
+        docker_registry_insecure: "{{ kolla_docker_registry_insecure | bool }}"
+        selinux_state: disabled
+        install_epel: "{{ kolla_ansible_install_epel | bool }}"
+        enable_host_ntp: false
+        # Kayobe performs creation of the Kolla Ansible user account, so there is no
+        # need for Kolla Ansible to repeat this.
+        create_kolla_user: false
+        # User account to use for Kolla SSH access.
+        kolla_user: "{{ kolla_ansible_user }}"
+        # Primary group of Kolla SSH user.
+        kolla_group: "{{ kolla_ansible_group }}"
+        virtualenv: "{{ kolla_ansible_target_venv }}"
+        # Avoid disabling the firewall on CentOS, since we manage it in Kayobe.
+        disable_firewall: "{{ ansible_facts.os_family == 'Debian' }}"
