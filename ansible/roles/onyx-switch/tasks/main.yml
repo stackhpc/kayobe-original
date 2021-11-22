@@ -1,0 +1,5 @@
+---
+- name: Template and apply Onyx switch configuration
+  onyx_config:
+    save: yes
+    src: onyx-config.j2

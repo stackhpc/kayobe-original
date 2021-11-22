@@ -1,0 +1,7 @@
+---
+###############################################################################
+# Authentication configuration.
+
+ansible_host: "{{ ansible_host|default(inventory_hostname) }}"
+ansible_ssh_pass: "{{ switch_auth_pass }}"
+ansible_user: "{{ ansible_user }}"

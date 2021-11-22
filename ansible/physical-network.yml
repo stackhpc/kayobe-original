@@ -31,6 +31,7 @@
       - junos
       - mellanox
       - nclu
+      - onyx
       - openvswitch
   tasks:
     - name: Fail if both interface name and description limits are specified
@@ -147,7 +148,7 @@
       junos_switch_config: "{{ switch_config }}"
       junos_switch_interface_config: "{{ switch_interface_config }}"
 
-- name: Ensure Mellanox physical switches are configured
+- name: Ensure MLNX-OS physical switches are configured
   hosts: switches_of_type_mellanox:&switches_in_display_mode_False
   gather_facts: no
   roles:
@@ -158,6 +159,16 @@
       mellanox_switch_provider: "{{ switch_mellanox_provider }}"
       mellanox_switch_config: "{{ switch_config }}"
       mellanox_switch_interface_config: "{{ switch_interface_config }}"
+
+- name: Ensure Mellanox Onyx physical switches are configured
+  hosts: switches_of_type_onyx:&switches_in_display_mode_False
+  gather_facts: no
+  roles:
+    - role: ssh-known-host
+
+    - role: onyx-switch
+      onyx_switch_config: "{{ switch_config }}"
+      onyx_switch_interface_config: "{{ switch_interface_config }}"
 
 - name: Ensure Cumulus physical switches are configured with NCLU
   hosts: switches_of_type_nclu:&switches_in_display_mode_False

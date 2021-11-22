@@ -21,6 +21,7 @@ The following switch operating systems are currently supported:
 * Dell PowerConnect
 * Juniper Junos OS
 * Mellanox MLNX OS
+* Mellanox Onyx
 
 Adding Devices to the Inventory
 ===============================
