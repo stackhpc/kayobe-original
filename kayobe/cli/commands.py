@@ -434,16 +434,6 @@ class SeedHypervisorHostConfigure(KollaAnsibleMixin, KayobeAnsibleMixin,
 
     def take_action(self, parsed_args):
         self.app.LOG.debug("Configuring seed hypervisor host OS")
-        # Explicitly request the dump-config tag to ensure this play runs even
-        # if the user specified tags.
-        ansible_user = self.run_kayobe_config_dump(
-            parsed_args, host="seed-hypervisor",
-            var_name="kayobe_ansible_user", tags="dump-config")
-        if not ansible_user:
-            self.app.LOG.error("Could not determine kayobe_ansible_user "
-                               "variable for seed hypervisor host")
-            sys.exit(1)
-
         # Allocate IP addresses.
         playbooks = _build_playbook_list("ip-allocation")
         self.run_kayobe_playbooks(parsed_args, playbooks,
@@ -451,7 +441,7 @@ class SeedHypervisorHostConfigure(KollaAnsibleMixin, KayobeAnsibleMixin,
 
         playbooks = _build_playbook_list(
             "ssh-known-host", "kayobe-ansible-user",
-            "dnf", "pip", "kayobe-target-venv")
+            "apt", "dnf", "pip", "kayobe-target-venv")
         if parsed_args.wipe_disks:
             playbooks += _build_playbook_list("wipe-disks")
         playbooks += _build_playbook_list(
@@ -605,7 +595,7 @@ class SeedHostConfigure(KollaAnsibleMixin, KayobeAnsibleMixin, VaultMixin,
         # Run kayobe playbooks.
         playbooks = _build_playbook_list(
             "ssh-known-host", "kayobe-ansible-user",
-            "dnf", "pip", "kayobe-target-venv")
+            "apt", "dnf", "pip", "kayobe-target-venv")
         if parsed_args.wipe_disks:
             playbooks += _build_playbook_list("wipe-disks")
         playbooks += _build_playbook_list(
@@ -1099,6 +1089,22 @@ class OvercloudDeprovision(KayobeAnsibleMixin, VaultMixin, Command):
         self.run_kayobe_playbooks(parsed_args, playbooks)
 
 
+class OvercloudFactsGather(KollaAnsibleMixin, KayobeAnsibleMixin, VaultMixin,
+                           Command):
+    """Gather facts for Kayobe and Kolla Ansible."""
+
+    def take_action(self, parsed_args):
+        self.app.LOG.debug("Gathering overcloud host facts")
+
+        # Gather facts for Kayobe.
+        playbooks = _build_playbook_list("overcloud-facts-gather")
+        self.run_kayobe_playbooks(parsed_args, playbooks)
+
+        # Gather facts for Kolla Ansible.
+        self.generate_kolla_ansible_config(parsed_args, service_config=False)
+        self.run_kolla_ansible_overcloud(parsed_args, "gather-facts")
+
+
 class OvercloudHostConfigure(KollaAnsibleMixin, KayobeAnsibleMixin, VaultMixin,
                              Command):
     """Configure the overcloud host OS and services.
@@ -1143,7 +1149,7 @@ class OvercloudHostConfigure(KollaAnsibleMixin, KayobeAnsibleMixin, VaultMixin,
         # Kayobe playbooks.
         playbooks = _build_playbook_list(
             "ssh-known-host", "kayobe-ansible-user",
-            "dnf", "pip", "kayobe-target-venv")
+            "apt", "dnf", "pip", "kayobe-target-venv")
         if parsed_args.wipe_disks:
             playbooks += _build_playbook_list("wipe-disks")
         playbooks += _build_playbook_list(
