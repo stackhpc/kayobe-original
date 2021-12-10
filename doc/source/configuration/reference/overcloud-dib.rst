@@ -77,6 +77,16 @@ the configuration drive built by Bifrost during provisioning.
     ``overcloud_dib_env_vars_extra``.
 ``overcloud_dib_packages``
     List of DIB packages to install. Default is to install no extra packages.
+``overcloud_dib_git_elements_default``
+    List of default git repositories containing Diskimage Builder (DIB)
+    elements. See stackhpc.os-images role for usage. Default is empty.
+``overcloud_dib_git_elements_extra``
+    List of additional git repositories containing Diskimage Builder (DIB)
+    elements. See stackhpc.os-images role for usage. Default is empty.
+``overcloud_dib_git_elements``
+    List of git repositories containing Diskimage Builder (DIB) elements. See
+    stackhpc.os-images role for usage. Default is a combination of
+    overcloud_dib_git_elements_default and overcloud_dib_git_elements_extra.
 ``overcloud_dib_upper_constraints_file``
     Upper constraints file for installing packages in the virtual environment
     used for building overcloud host disk images. Default is ``{{
