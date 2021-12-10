@@ -189,12 +189,6 @@ The name of the root disk image to deploy can be configured via the
 Kayobe inventory. This can be used to provision different images across the
 overcloud.
 
-.. note::
-
-   Support for building multiple disk images is not yet available. Images can
-   be manually renamed before changing the Kayobe configuration to build a
-   different image.
-
 Ironic configuration
 ====================
 
