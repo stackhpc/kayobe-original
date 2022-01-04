@@ -1,0 +1,4 @@
+---
+features:
+  - |
+    Kayobe now disables selinux on the seed-hypervisor.

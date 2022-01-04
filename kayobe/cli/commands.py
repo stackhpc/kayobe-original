@@ -403,6 +403,7 @@ class PhysicalNetworkConfigure(KayobeAnsibleMixin, VaultMixin, Command):
 
 
 class SeedHypervisorHostConfigure(KollaAnsibleMixin, KayobeAnsibleMixin,
+
                                   VaultMixin, Command):
     """Configure the seed hypervisor node host OS and services.
 
@@ -448,7 +449,7 @@ class SeedHypervisorHostConfigure(KollaAnsibleMixin, KayobeAnsibleMixin,
         if parsed_args.wipe_disks:
             playbooks += _build_playbook_list("wipe-disks")
         playbooks += _build_playbook_list(
-            "users", "dev-tools", "network", "firewall", "tuned", "sysctl",
+            "users", "dev-tools", "disable-selinux", "network", "firewall", "tuned", "sysctl",
             "time", "mdadm", "luks", "lvm", "seed-hypervisor-libvirt-host")
         self.run_kayobe_playbooks(parsed_args, playbooks,
                                   limit="seed-hypervisor")
