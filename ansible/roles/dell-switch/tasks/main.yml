@@ -18,4 +18,4 @@
     module: dellos10_config
     provider: "{{ dell_switch_provider }}"
     src: dellos10-config.j2
-  when: dell_switch_type == 'dellos10`
+  when: dell_switch_type == 'dellos10'
