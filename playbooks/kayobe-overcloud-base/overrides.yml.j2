@@ -35,6 +35,9 @@ aio_bridge_ports:
 kolla_enable_ironic: true
 
 {% if tls_enabled %}
+kolla_enable_nova_libvirt_container: false
+compute_libvirt_enable_tls: true
+
 kolla_enable_tls_external: "yes"
 kolla_enable_tls_internal: "yes"
 
