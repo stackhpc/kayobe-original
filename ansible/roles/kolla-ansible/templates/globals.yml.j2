@@ -387,6 +387,10 @@ enable_chrony: "{% raw %}{% if ansible_os_family == 'RedHat' and ansible_distrib
 # Valid options are [ none, novnc, spice, rdp ]
 #nova_console: "novnc"
 
+{% if kolla_libvirt_tls is not none %}
+libvirt_tls: {{ kolla_libvirt_tls | bool }}
+{% endif %}
+
 #################
 # Hyper-V options
 #################

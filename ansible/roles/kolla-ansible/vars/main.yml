@@ -178,6 +178,7 @@ kolla_feature_flags:
   - neutron_sriov
   - neutron_vpnaas
   - nova
+  - nova_libvirt_container
   - nova_serialconsole_proxy
   - nova_ssh
   - octavia

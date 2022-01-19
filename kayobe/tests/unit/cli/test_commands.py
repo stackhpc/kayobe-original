@@ -1163,6 +1163,8 @@ class TestCase(unittest.TestCase):
                         "ansible", "ceph-block-devices.yml"),
                     utils.get_data_files_path(
                         "ansible", "swift-block-devices.yml"),
+                    utils.get_data_files_path(
+                        "ansible", "compute-libvirt-host.yml"),
                 ],
                 limit="overcloud",
                 extra_vars={"pip_applicable_users": [None]},
