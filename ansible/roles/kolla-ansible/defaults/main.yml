@@ -233,6 +233,10 @@ kolla_openstack_logging_debug:
 # controllers.
 kolla_nova_compute_ironic_host:
 
+# Which host to use to deploy the ironic-inspector services for ironic. By
+# default this is none and all hosts in the controllers group are used instead.
+kolla_ironic_inspector_host:
+
 ###############################################################################
 # Extra free-form configuraton.
 

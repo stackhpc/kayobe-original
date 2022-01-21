@@ -7,6 +7,21 @@
 controller_bootstrap_user: "{{ os_distribution }}"
 
 ###############################################################################
+# Controller groups.
+
+# Ansible inventory group in which Ironic conductor services are deployed.
+# Default is 'controllers'.
+controller_ironic_group: controllers
+
+# Ansible inventory group in which control plane load balancer services are
+# deployed. Default is 'controllers'.
+controller_loadbalancer_group: controllers
+
+# Ansible inventory group in which network data plane services are deployed.
+# Default is 'network'.
+controller_network_group: network
+
+###############################################################################
 # Controller network interface configuration.
 
 # List of networks to which controller nodes are attached.
