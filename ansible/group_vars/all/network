@@ -64,6 +64,60 @@ inspection_net_name: "{{ 'inspection_net' if kolla_enable_ironic | bool else Non
 cleaning_net_name: "{{ provision_wl_net_name }}"
 
 ###############################################################################
+# Network interfaces.
+
+# List of networks to which nodes are attached.
+network_interfaces_required:
+  - networks:
+      - "{{ admin_oc_net_name }}"
+    required: True
+  - networks:
+      - "{{ oob_oc_net_name }}"
+      - "{{ provision_oc_net_name }}"
+    required: "{{ 'seed' in group_names }}"
+  - networks:
+      - "{{ oob_wl_net_name }}"
+      - "{{ provision_wl_net_name }}"
+      - "{{ inspection_net_name }}"
+      - "{{ cleaning_net_name }}"
+    required: "{{ kolla_enable_ironic | bool and controller_ironic_group in group_names }}"
+  - networks:
+      - "{{ internal_net_name }}"
+    required: "{{ 'overcloud' in group_names }}"
+  - networks: "{{ external_net_names }}"
+    required: "{{ controller_network_group in group_names or (kolla_enable_neutron_provider_networks | bool and 'compute' in group_names) }}"
+  - networks:
+      - "{{ public_net_name }}"
+    required: "{{ controller_loadbalancer_group in group_names }}"
+  - networks:
+      - "{{ tunnel_net_name }}"
+    required: "{{ ['compute', controller_network_group] | intersect(group_names) | list | length > 0 }}"
+  - networks:
+      - "{{ storage_net_name }}"
+    required: >-
+      {{ ['compute', 'controllers', 'storage'] | intersect(group_names) | list | length > 0 or
+         (kolla_enable_manila | bool and controller_network_group in group_names) }}
+  - networks:
+      - "{{ storage_mgmt_net_name }}"
+    required: "{{ 'storage' in group_names }}"
+  - networks:
+      - "{{ swift_storage_net_name }}"
+    required: "{{ kolla_enable_swift | bool and ('controllers' in group_names or storage_needs_swift_network) }}"
+  - networks:
+      - "{{ swift_storage_replication_net_name }}"
+    required: "{{ kolla_enable_swift | bool and storage_needs_swift_replication_network }}"
+
+# List of networks to which nodes are attached.
+network_interfaces_default: >-
+  {{ network_interfaces_required |
+     selectattr('required') |
+     map(attribute='networks') |
+     flatten |
+     select |
+     unique |
+     list }}
+
+###############################################################################
 # Network interface naming conventions.
 
 # Suffix for Open vSwitch bridge names.
