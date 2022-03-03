@@ -43,5 +43,17 @@
 #kayobe_ansible_user:
 
 ###############################################################################
+# OS distribution.
+
+# OS distribution name. Valid options are "centos", "rocky", "ubuntu". Default
+# is "centos".
+#os_distribution:
+
+# OS release. Valid options are "8-stream" when os_distribution is "centos", or
+# "8" when os_distribution is "rocky", or "focal" when os_distribution is
+# "ubuntu".
+#os_release:
+
+###############################################################################
 # Dummy variable to allow Ansible to accept this file.
 workaround_ansible_issue_8743: yes
