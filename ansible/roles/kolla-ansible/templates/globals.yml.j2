@@ -391,6 +391,9 @@ enable_chrony: "{% raw %}{% if ansible_os_family == 'RedHat' and ansible_distrib
 libvirt_tls: {{ kolla_libvirt_tls | bool }}
 {% endif %}
 
+{% if kolla_libvirt_enable_sasl is not none %}
+libvirt_enable_sasl: {{ kolla_libvirt_enable_sasl | bool }}
+{% endif %}
 #################
 # Hyper-V options
 #################
