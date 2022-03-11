@@ -11,6 +11,10 @@
 # {{ openstack_branch }}.
 #kolla_bifrost_source_version:
 
+# Whether Bifrost uses firewalld. Default value is false to avoid conflicting
+# with iptables rules configured on the seed host by Kayobe.
+#kolla_bifrost_use_firewalld:
+
 # Firewalld zone used by Bifrost. Default is "trusted", to avoid blocking other
 # services running on the seed host.
 #kolla_bifrost_firewalld_internal_zone:
@@ -73,6 +77,9 @@
 #kolla_bifrost_inspector_port_addition:
 
 # List of extra kernel parameters for the inspector default PXE configuration.
+# Default is {{ inspector_extra_kernel_options }}, defined in inspector.yml.
+# When customising this variable, the default extra kernel parameters should be
+# kept to retain full node inspection capabilities.
 #kolla_bifrost_inspector_extra_kernel_options:
 
 # List of introspection rules for Bifrost's Ironic Inspector service.
