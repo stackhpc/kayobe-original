@@ -434,16 +434,6 @@ class SeedHypervisorHostConfigure(KollaAnsibleMixin, KayobeAnsibleMixin,
 
     def take_action(self, parsed_args):
         self.app.LOG.debug("Configuring seed hypervisor host OS")
-        # Explicitly request the dump-config tag to ensure this play runs even
-        # if the user specified tags.
-        ansible_user = self.run_kayobe_config_dump(
-            parsed_args, host="seed-hypervisor",
-            var_name="kayobe_ansible_user", tags="dump-config")
-        if not ansible_user:
-            self.app.LOG.error("Could not determine kayobe_ansible_user "
-                               "variable for seed hypervisor host")
-            sys.exit(1)
-
         # Allocate IP addresses.
         playbooks = _build_playbook_list("ip-allocation")
         self.run_kayobe_playbooks(parsed_args, playbooks,
@@ -697,7 +687,6 @@ class SeedServiceDeploy(KollaAnsibleMixin, KayobeAnsibleMixin, VaultMixin,
     * Configures the bifrost service.
     * Deploys the bifrost container using kolla-ansible.
     * Builds disk images for the overcloud hosts using Diskimage Builder (DIB).
-    * Performs a workaround in the overcloud host image to fix resolv.conf.
     * Configures ironic inspector introspection rules in the bifrost inspector
       service.
     * When enabled, configures a Bare Metal Provisioning (BMP) environment for
@@ -714,7 +703,6 @@ class SeedServiceDeploy(KollaAnsibleMixin, KayobeAnsibleMixin, VaultMixin,
 
         self.run_kolla_ansible_seed(parsed_args, "deploy-bifrost")
         playbooks = _build_playbook_list(
-            "overcloud-host-image-workaround-resolv",
             "seed-introspection-rules",
             "dell-switch-bmp")
         self.run_kayobe_playbooks(parsed_args, playbooks)
@@ -730,7 +718,6 @@ class SeedServiceUpgrade(KollaAnsibleMixin, KayobeAnsibleMixin, VaultMixin,
     * Prepares the bifrost service for an upgrade.
     * Deploys the bifrost container using kolla-ansible.
     * Builds disk images for the overcloud hosts using Diskimage Builder (DIB).
-    * Performs a workaround in the overcloud host image to fix resolv.conf.
     * Configures ironic inspector introspection rules in the bifrost inspector
       service.
     * When enabled, configures a Bare Metal Provisioning (BMP) environment for
@@ -750,7 +737,6 @@ class SeedServiceUpgrade(KollaAnsibleMixin, KayobeAnsibleMixin, VaultMixin,
         self.run_kayobe_playbooks(parsed_args, playbooks)
         self.run_kolla_ansible_seed(parsed_args, "upgrade-bifrost")
         playbooks = _build_playbook_list(
-            "overcloud-host-image-workaround-resolv",
             "seed-introspection-rules",
             "dell-switch-bmp")
         self.run_kayobe_playbooks(parsed_args, playbooks)
@@ -927,6 +913,22 @@ class OvercloudDeprovision(KayobeAnsibleMixin, VaultMixin, Command):
         self.run_kayobe_playbooks(parsed_args, playbooks)
 
 
+class OvercloudFactsGather(KollaAnsibleMixin, KayobeAnsibleMixin, VaultMixin,
+                           Command):
+    """Gather facts for Kayobe and Kolla Ansible."""
+
+    def take_action(self, parsed_args):
+        self.app.LOG.debug("Gathering overcloud host facts")
+
+        # Gather facts for Kayobe.
+        playbooks = _build_playbook_list("overcloud-facts-gather")
+        self.run_kayobe_playbooks(parsed_args, playbooks)
+
+        # Gather facts for Kolla Ansible.
+        self.generate_kolla_ansible_config(parsed_args, service_config=False)
+        self.run_kolla_ansible_overcloud(parsed_args, "gather-facts")
+
+
 class OvercloudHostConfigure(KollaAnsibleMixin, KayobeAnsibleMixin, VaultMixin,
                              Command):
     """Configure the overcloud host OS and services.
@@ -1065,6 +1067,10 @@ class OvercloudDatabaseBackup(KollaAnsibleMixin, KayobeAnsibleMixin,
 
     def take_action(self, parsed_args):
         self.app.LOG.debug("Performing overcloud database backup")
+
+        # First prepare configuration.
+        self.generate_kolla_ansible_config(parsed_args, service_config=False)
+
         extra_args = []
         if parsed_args.incremental:
             extra_args.append('--incremental')
@@ -1089,6 +1095,10 @@ class OvercloudDatabaseRecover(KollaAnsibleMixin, KayobeAnsibleMixin,
     def take_action(self, parsed_args):
         self.app.LOG.debug("Performing overcloud database recovery")
         extra_vars = {}
+
+        # First prepare configuration.
+        self.generate_kolla_ansible_config(parsed_args, service_config=True)
+
         if parsed_args.force_recovery_host:
             extra_vars['mariadb_recover_inventory_name'] = (
                 parsed_args.force_recovery_host)
