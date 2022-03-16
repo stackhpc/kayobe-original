@@ -15,7 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# This file has been adatped from the merge_configs action plugin in Kolla
+# This file has been adapted from the merge_configs action plugin in Kolla
 # Ansible.
 # https://opendev.org/openstack/kolla-ansible/src/branch/master/ansible/action_plugins/merge_configs.py
 
@@ -50,6 +50,12 @@ options:
     default: None
     required: True
     type: str
+  whitespace:
+    description:
+      - Whether whitespace characters should be used around equal signs
+    default: True
+    required: False
+    type: bool
 author: Sam Yaple
 '''
 
@@ -71,10 +77,11 @@ Merge multiple configs:
 
 class OverrideConfigParser(iniparser.BaseParser):
 
-    def __init__(self):
+    def __init__(self, whitespace=True):
         self._cur_sections = collections.OrderedDict()
         self._sections = collections.OrderedDict()
         self._cur_section = None
+        self._whitespace = ' ' if whitespace else ''
 
     def assignment(self, key, value):
         if self._cur_section is None:
@@ -111,12 +118,24 @@ class OverrideConfigParser(iniparser.BaseParser):
         def write_key_value(key, values):
             for v in values:
                 if not v:
-                    fp.write('{} =\n'.format(key))
+                    fp.write('{key}{ws}=\n'.format(
+                        key=key, ws=self._whitespace))
                 for index, value in enumerate(v):
                     if index == 0:
-                        fp.write('{} = {}\n'.format(key, value))
+                        fp.write('{key}{ws}={ws}{value}\n'.format(
+                            key=key,
+                            ws=self._whitespace,
+                            value=value))
                     else:
-                        fp.write('{}   {}\n'.format(len(key) * ' ', value))
+                        # We want additional values to be written out under the
+                        # first value with the same indentation, like this:
+                        # key = value1
+                        #       value2
+                        indent_size = len(key) + len(self._whitespace) * 2 + 1
+                        ws_indent = ' ' * indent_size
+                        fp.write('{ws_indent}{value}\n'.format(
+                            ws_indent=ws_indent,
+                            value=value))
 
         def write_section(section):
             for key, values in section.items():
@@ -162,7 +181,8 @@ class ActionModule(action.ActionBase):
         if not isinstance(sources, list):
             sources = [sources]
 
-        config = OverrideConfigParser()
+        config = OverrideConfigParser(
+            whitespace=self._task.args.get('whitespace', True))
 
         for source in sources:
             self.read_config(source, config)
@@ -183,6 +203,7 @@ class ActionModule(action.ActionBase):
 
             new_task = self._task.copy()
             new_task.args.pop('sources', None)
+            new_task.args.pop('whitespace', None)
 
             new_task.args.update(
                 dict(

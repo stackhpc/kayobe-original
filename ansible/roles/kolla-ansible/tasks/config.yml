@@ -49,7 +49,7 @@
 
 - name: Ensure the Kolla global configuration file exists
   merge_yaml:
-    sources: "{{ kolla_extra_globals_paths | unique | list }}"
+    sources: "{{ kolla_globals_paths | product(['/kolla/globals.yml']) | map('join') | unique | list }}"
     dest: "{{ kolla_config_path }}/globals.yml"
     mode: 0640
   vars:

@@ -15,7 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# This file has been adatped from the merge_yaml action plugin in Kolla
+# This file has been adapted from the merge_yaml action plugin in Kolla
 # Ansible.
 # https://opendev.org/openstack/kolla-ansible/src/branch/master/ansible/action_plugins/merge_yaml.py
 

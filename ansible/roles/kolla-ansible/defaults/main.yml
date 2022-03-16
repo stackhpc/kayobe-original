@@ -165,6 +165,9 @@ kolla_inspector_dhcp_pool_start:
 # End of range of IP addresses for dnsmasq to allocate from.
 kolla_inspector_dhcp_pool_end:
 
+# The inspection network netmask.
+kolla_inspector_netmask:
+
 # Default gateway to use for inspection network.
 kolla_inspector_default_gateway:
 
@@ -236,8 +239,19 @@ kolla_nova_compute_ironic_host:
 kolla_extra_globals:
 
 # List of paths to YAML files containing extra configuration to merge to {{
-# kolla_config_path }}/globals.yml.
-kolla_extra_globals_paths:
+# kolla_config_path }}/globals.yml. Default is include the globals.yml template
+# from the role.
+kolla_globals_paths_default:
+  - "{{ role_path }}/templates"
+
+# List of paths to YAML files containing extra configuration to merge to {{
+# kolla_config_path }}/globals.yml. Default is an empty list.
+kolla_globals_paths_extra: []
+
+# List of paths to YAML files containing extra configuration to merge to {{
+# kolla_config_path }}/globals.yml. Default is combination of
+# kolla_globals_paths_default and kolla_globals_paths_extra.
+kolla_globals_paths: "{{ kolla_globals_paths_default + kolla_globals_paths_extra }}"
 
 # Dictionary containing custom passwords to add or override in the Kolla
 # passwords file.

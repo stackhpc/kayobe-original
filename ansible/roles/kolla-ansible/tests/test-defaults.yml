@@ -39,6 +39,8 @@
             kolla_enable_tls_internal: False
             kolla_enable_grafana: False
             kolla_openstack_logging_debug: False
+            kolla_globals_paths_extra:
+              - "{{ tempfile_result.path ~ '/etc/kayobe/' }}"
             apt_cache_valid_time: 3600
             kolla_extra_globals_path: "{{ tempfile_result.path ~ '/etc/kayobe/kolla/globals.yml' }}"
             kolla_extra_globals_paths:
