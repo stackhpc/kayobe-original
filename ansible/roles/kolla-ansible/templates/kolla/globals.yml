@@ -1,6 +1,4 @@
 ---
-# {{ ansible_managed }}
-
 # You can use this file to override _any_ variable throughout Kolla.
 # Additional options can be found in the
 # 'kolla-ansible/ansible/group_vars/all.yml' file. Default value of all the
@@ -114,7 +112,7 @@ docker_custom_config: {{ kolla_docker_custom_config | to_nice_json | indent(2) }
 #dns_address_family: "{% raw %}{{ network_address_family }}{% endraw %}"
 
 # Valid options are [ openvswitch, linuxbridge ]
-neutron_plugin_agent: "openvswitch"
+neutron_plugin_agent: "{% if kolla_enable_ovn | default(False) | bool %}ovn{% else %}openvswitch{% endif %}"
 
 # Valid options are [ internal, infoblox ]
 #neutron_ipam_driver: "internal"
@@ -564,6 +562,9 @@ kolla_group: "{{ kolla_ansible_group }}"
 {% if kolla_ansible_target_venv %}
 virtualenv: {{ kolla_ansible_target_venv }}
 {% endif %}
+
+# Avoid disabling the firewall on CentOS, since we manage it in Kayobe.
+disable_firewall: "{% raw %}{{ ansible_facts.os_family == 'Debian' }}{% endraw %}"
 
 {% if kolla_extra_globals %}
 #######################
