@@ -10,9 +10,9 @@ roles:
   - src: MichaelRigart.interfaces
     version: v1.12.0
   - src: mrlesmithjr.chrony
-    version: v0.1.1
+    version: v0.1.4
   - src: mrlesmithjr.manage-lvm
-    version: v0.2.2
+    version: v0.2.6
   - src: mrlesmithjr.mdadm
     version: v0.1.1
   - src: singleplatform-eng.users
