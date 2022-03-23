@@ -107,10 +107,9 @@
         kolla_inspector_extra_kernel_options: "{{ inspector_extra_kernel_options }}"
         kolla_enable_host_ntp: false
         docker_daemon_mtu: "{{ public_net_name | net_mtu | default }}"
-        kolla_extra_globals_paths:
-          - "{{ role_path ~ '/templates/globals.yml.j2' }}"
-          - "{{ kayobe_config_path ~ '/kolla/globals.yml' }}"
-          - "{{ kayobe_env_config_path ~ '/kolla/globals.yml' }}"
+        kolla_globals_paths_extra:
+          - "{{ kayobe_config_path }}"
+          - "{{ kayobe_env_config_path }}"
 
 - name: Generate Kolla Ansible host vars for the seed host
   hosts: seed
