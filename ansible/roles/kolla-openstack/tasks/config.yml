@@ -35,7 +35,7 @@
     include_globs: "{{ kolla_openstack_custom_config_include_globs }}"
     merge_ini_globs: "{{ kolla_openstack_custom_config_merge_ini_globs }}"
     merge_yml_globs: "{{ kolla_openstack_custom_config_merge_yml_globs }}"
-    search_paths: "{{ kolla_extra_config_paths }}"
+    search_paths: "{{ kolla_config_paths_extra }}"
     template_exclude_globs: "{{ kolla_openstack_custom_config_template_exclude_globs }}"
   register: kolla_custom_config_info
 

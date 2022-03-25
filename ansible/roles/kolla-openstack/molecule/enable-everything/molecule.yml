@@ -16,7 +16,7 @@ provisioner:
     group_vars:
       all:
         kolla_extra_config_path: "${MOLECULE_TEMP_PATH:-/tmp}"
-        kolla_extra_config_paths:
+        kolla_config_paths_extra:
           - "{{ kolla_extra_config_path }}"
           - "{{ role_path }}/templates/kolla/config"
         kolla_openstack_custom_config_merge_yml_globs_extra:
