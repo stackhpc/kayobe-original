@@ -180,6 +180,7 @@ kolla_openstack_custom_config_template_exclude_globs_default:
   - swift/container.ring.gz
   - swift/object.builder
   - swift/object.ring.gz
+  - **/*.pem
 
 # Extra items to add to kolla_openstack_custom_config_template_exclude_globs_default
 # to produce kolla_openstack_custom_config_template_exclude_globs.
@@ -693,9 +694,15 @@ kolla_extra_neutron_ml2:
 # Whether to enable Nova.
 kolla_enable_nova: False
 
-# Deprecated:
 # Free form extra configuration to append to nova.conf.
 kolla_extra_nova:
+
+# Whether libvirt TLS is enabled.
+kolla_libvirt_tls:
+
+# Directory containing libvirt certificates for nova-compute when running
+# libvirt on the host.
+kolla_nova_libvirt_certificates_src:
 
 ###############################################################################
 # Octavia configuration.

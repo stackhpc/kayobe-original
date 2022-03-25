@@ -100,6 +100,53 @@
     ipa_image_name: "ipa"
   pre_tasks:
     - block:
+        - name: Check whether Kolla extra configuration files exist
+          stat:
+            path: "{{ kayobe_env_config_path }}/kolla/config/{{ item.file }}"
+            get_checksum: False
+            get_md5: False
+            mime: False
+          register: stat_result
+          with_items:
+            - { name: aodh, file: aodh.conf }
+            - { name: barbican, file: barbican.conf }
+            - { name: blazar, file: blazar.conf }
+            - { name: ceilometer, file: ceilometer.conf }
+            - { name: cinder, file: cinder.conf }
+            - { name: cloudkitty, file: cloudkitty.conf }
+            - { name: designate, file: designate.conf }
+            - { name: glance, file: glance.conf }
+            - { name: global, file: global.conf }
+            - { name: gnocchi, file: gnocchi.conf }
+            - { name: grafana, file: grafana.ini }
+            - { name: heat, file: heat.conf }
+            - { name: inspector, file: ironic-inspector.conf }
+            - { name: ironic, file: ironic.conf }
+            - { name: kafka, file: kafka.server.properties }
+            - { name: keystone, file: keystone.conf }
+            - { name: magnum, file: magnum.conf }
+            - { name: manila, file: manila.conf }
+            - { name: mariabackup, file: backup.my.cnf }
+            - { name: mariadb, file: galera.cnf }
+            - { name: masakari, file: masakari.conf }
+            - { name: murano, file: murano.conf }
+            - { name: neutron, file: neutron.conf }
+            - { name: neutron_ml2, file: neutron/ml2_conf.ini }
+            - { name: nova, file: nova.conf }
+            - { name: octavia, file: octavia.conf }
+            - { name: sahara, file: sahara.conf }
+            - { name: zookeeper, file: zookeeper.cfg }
+
+        - name: Initialise a fact containing extra configuration
+          set_fact:
+            kolla_extra_config: {}
+
+        - name: Update a fact containing extra configuration
+          set_fact:
+            kolla_extra_config: "{{ kolla_extra_config | combine({item.item.name: lookup('template', '{{ item.stat.path }}')}) }}"
+          with_items: "{{ stat_result.results }}"
+          when: item.stat.exists
+
         - name: Validate switch configuration for Neutron ML2 genericswitch driver
           fail:
             msg: >
@@ -173,3 +220,5 @@
       kolla_config_paths_static:
         - "{{ kayobe_config_path }}"
       kolla_config_paths_extra: "{{ kolla_config_paths_static + kayobe_env_search_paths }}"
+      kolla_libvirt_tls: "{{ compute_libvirt_enable_tls | bool }}"
+      kolla_nova_libvirt_certificates_src: "{{ kayobe_env_config_path }}/certificates/libvirt"

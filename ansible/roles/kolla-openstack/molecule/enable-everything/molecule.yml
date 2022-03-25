@@ -24,40 +24,126 @@ provisioner:
         kolla_openstack_custom_config_merge_ini_globs_extra:
           - glob: aodh/dummy.ini
         kolla_enable_aodh: true
+        kolla_extra_aodh: |
+          [extra-aodh.conf]
+          foo=bar
         kolla_enable_barbican: true
+        kolla_extra_barbican: |
+          [extra-barbican.conf]
+          foo=bar
         kolla_enable_blazar: true
+        kolla_extra_blazar: |
+          [extra-blazar.conf]
+          foo=bar
         kolla_enable_ceilometer: true
+        kolla_extra_ceilometer: |
+          [extra-ceilometer.conf]
+          foo=bar
         kolla_enable_cinder: true
+        kolla_extra_cinder: |
+          [extra-cinder.conf]
+          foo=bar
         kolla_enable_cloudkitty: true
+        kolla_extra_cloudkitty: |
+          [extra-cloudkitty.conf]
+          foo=bar
         kolla_enable_designate: true
+        kolla_extra_designate: |
+          [extra-designate.conf]
+          foo=bar
         kolla_enable_elasticsearch: true
         kolla_enable_glance: true
+        kolla_extra_glance: |
+          [extra-glance.conf]
+          foo=bar
+        kolla_extra_global: |
+          [extra-global.conf]
         kolla_enable_gnocchi: true
+        kolla_extra_gnocchi: |
+          [extra-gnocchi.conf]
+          foo=bar
         kolla_enable_grafana: true
+        kolla_extra_grafana: |
+          [extra-grafana.ini]
+          foo=bar
         kolla_enable_haproxy: true
         kolla_enable_heat: true
+        kolla_extra_heat: |
+          [extra-heat.conf]
+          foo=bar
         kolla_enable_horizon: true
         kolla_enable_influxdb: true
         kolla_enable_ironic: true
+        kolla_extra_ironic: |
+          [extra-ironic.conf]
+          foo=bar
+        kolla_extra_inspector: |
+          [extra-ironic-inspector.conf]
+          foo=bar
         kolla_inspector_ipa_kernel_path: ${MOLECULE_TEMP_PATH:-/tmp}/ironic-agent.kernel
         kolla_inspector_ipa_ramdisk_path: ${MOLECULE_TEMP_PATH:-/tmp}/ironic-agent.initramfs
         kolla_enable_kafka: true
+        kolla_extra_kafka: |
+          [extra-kafka.server.properties]
+          foo=bar
         kolla_enable_keystone: true
+        kolla_extra_keystone: |
+          [extra-keystone.conf]
+          foo=bar
         kolla_enable_magnum: true
+        kolla_extra_magnum: |
+          [extra-magnum.conf]
+          foo=bar
         kolla_enable_manila: true
+        kolla_extra_manila: |
+          [extra-manila.conf]
+          foo=bar
         kolla_enable_mariabackup: true
+        kolla_extra_mariabackup: |
+          [extra-backup.my.cnf]
+          foo=bar
         kolla_enable_mariadb: true
+        kolla_extra_mariadb: |
+          [extra-galera.cnf]
+          foo=bar
         kolla_enable_masakari: true
+        kolla_extra_masakari: |
+          [extra-masakari.conf]
+          foo=bar
         kolla_enable_monasca: true
         kolla_enable_murano: true
+        kolla_extra_murano: |
+          [extra-murano.conf]
+          foo=bar
         kolla_enable_neutron: true
+        kolla_extra_neutron: |
+          [extra-neutron.conf]
+          foo=bar
+        kolla_extra_neutron_ml2: |
+          [extra-ml2_conf.ini]
+          foo=bar
         kolla_enable_nova: true
+        kolla_enable_nova_libvirt_container: false
+        kolla_extra_nova: |
+          [extra-nova.conf]
+          foo=bar
+        kolla_libvirt_tls: true
+        kolla_nova_libvirt_certificates_src: ${MOLECULE_TEMP_PATH:-/tmp}/molecule/nova-libvirt/certificates
         kolla_enable_octavia: true
+        kolla_extra_octavia: |
+          [extra-octavia.conf]
+          foo=bar
         kolla_enable_prometheus: true
         kolla_enable_sahara: true
+        kolla_extra_sahara: |
+          [extra-sahara.conf]
+          foo=bar
         kolla_enable_swift: true
         kolla_enable_storm: true
         kolla_enable_zookeeper: true
+        kolla_extra_zookeeper: |
+          [extra-zookeeper.cfg]
+          foo=bar
   lint:
     name: ansible-lint
 scenario:

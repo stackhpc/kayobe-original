@@ -31,10 +31,16 @@ pip_trusted_hosts:
 aio_bridge_ports:
   - dummy1
 
+# Generate a password for libvirt SASL authentication.
+compute_libvirt_sasl_password: "{% raw %}{{ lookup('password', '/tmp/libvirt-sasl-password') }}{% endraw %}"
+
 # Enable ironic for testing baremetal compute.
 kolla_enable_ironic: true
 
 {% if tls_enabled %}
+kolla_enable_nova_libvirt_container: false
+compute_libvirt_enable_tls: true
+
 kolla_enable_tls_external: "yes"
 kolla_enable_tls_internal: "yes"
 

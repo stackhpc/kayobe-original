@@ -130,3 +130,6 @@ chrony_ntp_servers:
     options:
       - option: maxsources
         val: 2
+
+# Generate a password for libvirt SASL authentication.
+compute_libvirt_sasl_password: "{% raw %}{{ lookup('password', '/tmp/libvirt-sasl-password') }}{% endraw %}"
