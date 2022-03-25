@@ -243,6 +243,8 @@ kolla_extra_globals:
 # from the role.
 kolla_globals_paths_default:
   - "{{ role_path }}/templates"
+  - "{{ kayobe_config_path }}/kolla"
+  - "{{ kayobe_env_config_path }}/kolla"
 
 # List of paths to YAML files containing extra configuration to merge to {{
 # kolla_config_path }}/globals.yml. Default is an empty list.

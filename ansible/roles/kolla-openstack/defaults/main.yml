@@ -1,7 +1,18 @@
 ---
-# Ordered list of paths to extra kolla-ansible configuration files. Most
-# specific first.
+# Ordered list of paths to extra kolla-ansible configuration files. Least
+# specific first. Default is search the role templates in
+# templates/kolla/config.
+kolla_config_paths_default:
+  - "{{ role_path }}/templates"
+
+# Ordered list of paths to extra kolla-ansible configuration files. Least
+# specific first. Default is an empty list.
 kolla_config_paths_extra: []
+
+# Ordered list of paths to extra kolla-ansible configuration files. Least
+# specific first. Default is a combination of kolla_config_paths_default
+# and kolla_config_paths_extra
+kolla_config_paths: "{{ kolla_config_paths_default + kolla_config_paths_extra }}"
 
 # Directory where Kolla custom configuration files will be installed.
 kolla_node_custom_config_path: /etc/kolla/config
