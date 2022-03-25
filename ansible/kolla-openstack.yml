@@ -172,4 +172,4 @@
         endpoint_override: "http://{% raw %}{{ api_interface_address }}{% endraw %}:{{ inspector_store_port }}"
       kolla_config_paths_static:
         - "{{ kayobe_config_path }}"
-      kolla_extra_config_paths: "{{ kolla_config_paths_static + kayobe_env_search_paths }}"
+      kolla_config_paths_extra: "{{ kolla_config_paths_static + kayobe_env_search_paths }}"
