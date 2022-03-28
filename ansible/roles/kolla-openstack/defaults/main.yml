@@ -180,7 +180,7 @@ kolla_openstack_custom_config_template_exclude_globs_default:
   - swift/container.ring.gz
   - swift/object.builder
   - swift/object.ring.gz
-  - **/*.pem
+  - '**/*.pem'
 
 # Extra items to add to kolla_openstack_custom_config_template_exclude_globs_default
 # to produce kolla_openstack_custom_config_template_exclude_globs.
