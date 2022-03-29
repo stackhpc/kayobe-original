@@ -43,9 +43,11 @@ kolla_ansible_venv: "{{ lookup('env', 'KOLLA_VENV_PATH') | default(lookup('env',
 # Extra requirements to install inside the kolla-ansible virtualenv.
 kolla_ansible_venv_extra_requirements: []
 
-# Whether the virtual environment will inherit packages from the global
-# site-packages directory. Default is false.
-kolla_ansible_venv_site_packages: false
+# Pip requirement specifier for the ansible package. Default is:
+# 'ansible>=2.10.0,<5.0'. NOTE: Limit the version of ansible used by
+# kolla-ansible to avoid new releases from breaking tested code. Changes to
+# this limit should be tested.
+kolla_ansible_venv_ansible: 'ansible>=2.10.0,<5.0'
 
 # Path to Kolla-ansible configuration directory.
 kolla_config_path: "{{ lookup('env', 'KOLLA_CONFIG_PATH') | default('/etc/kolla', true) }}"
