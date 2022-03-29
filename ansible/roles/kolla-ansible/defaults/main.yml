@@ -21,6 +21,11 @@ kolla_ansible_venv_python: python3
 # Extra requirements to install inside the kolla-ansible virtualenv.
 kolla_ansible_venv_extra_requirements: []
 
+# Pip requirement specifier for the ansible package. NOTE: This limits the
+# version of ansible used by kolla-ansible to avoid new releases from breaking
+# tested code. Changes to this limit should be tested.
+kolla_ansible_venv_ansible: 'ansible>=2.9,<2.11,!=2.9.8,!=2.9.12'
+
 # Virtualenv directory where Kolla-ansible's ansible modules will execute
 # remotely on the target nodes. If None, no virtualenv will be used.
 kolla_ansible_target_venv:
