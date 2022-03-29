@@ -104,4 +104,5 @@
     state: latest
     extra_args: "{% if kolla_upper_constraints_file %}-c {{ kolla_upper_constraints_file }}{% endif %}"
     virtualenv: "{{ kolla_ansible_venv }}"
+    virtualenv_site_packages: "{{ kolla_ansible_venv_site_packages }}"
     virtualenv_python: "{{ kolla_ansible_venv_python }}"

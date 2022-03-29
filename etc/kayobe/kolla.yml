@@ -50,6 +50,10 @@
 # Extra requirements to install inside the kolla-ansible virtualenv.
 #kolla_ansible_venv_extra_requirements:
 
+# Whether the virtual environment will inherit packages from the global
+# site-packages directory. Default is false.
+# kolla_ansible_venv_site_packages:
+
 # Path to Kolla-ansible configuration directory. Default is $KOLLA_CONFIG_PATH
 # or /etc/kolla if $KOLLA_CONFIG_PATH is not set.
 #kolla_config_path:
