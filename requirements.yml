@@ -9,7 +9,7 @@
 - src: mrlesmithjr.manage-lvm
   version: v0.1.4
 - src: mrlesmithjr.mdadm
-  version: v0.1.1
+  version: v0.1.0
 - src: stackhpc.ntp
   version: 2.0.0
 - src: singleplatform-eng.users

@@ -92,10 +92,11 @@ Create a virtualenv for Kayobe::
 
     $ virtualenv <base_path>/venvs/kayobe
 
-Activate the virtualenv and update pip::
+Activate the virtualenv and update pip and setuptools::
 
     $ source <base_path>/venvs/kayobe/bin/activate
     (kayobe) $ pip install -U pip
+    (kayobe) $ pip install -U setuptools
 
 If using the latest version of Kayobe::
 
@@ -108,6 +109,8 @@ Alternatively, to install a specific release of Kayobe::
 Finally, deactivate the virtualenv::
 
     (kayobe) $ deactivate
+
+.. _installation-source:
 
 Installation from source
 ========================
@@ -129,10 +132,11 @@ Create a virtualenv for Kayobe::
 
     $ virtualenv <base_path>/venvs/kayobe
 
-Activate the virtualenv and update pip::
+Activate the virtualenv and update pip and setuptools::
 
     $ source <base_path>/venvs/kayobe/bin/activate
     (kayobe) $ pip install -U pip
+    (kayobe) $ pip install -U setuptools
 
 Install Kayobe and its dependencies using the source code checkout::
 
