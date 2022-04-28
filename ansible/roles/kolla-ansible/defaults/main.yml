@@ -24,7 +24,7 @@ kolla_ansible_venv_python_major_version: "{{ ansible_python.version.major }}"
 # Pip requirement specifier for the ansible package. NOTE: This limits the
 # version of ansible used by kolla-ansible to avoid new releases from breaking
 # tested code. Changes to this limit should be tested.
-kolla_ansible_venv_ansible: 'ansible>=2.6,<2.9,!=2.8.9,!=2.8.14'
+kolla_ansible_venv_ansible: 'ansible@git+https://github.com/stackhpc/ansible@stackhpc/2.8/rocky'
 
 # Virtualenv directory where Kolla-ansible's ansible modules will execute
 # remotely on the target nodes. If None, no virtualenv will be used.
