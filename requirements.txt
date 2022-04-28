@@ -3,7 +3,7 @@
 # process, which may cause wedges in the gate later.
 
 pbr>=2.0 # Apache-2.0
-git+https://github.com/stackhpc/ansible@stackhpc/2.8/rocky-linux # GPL v3
+git+https://github.com/stackhpc/ansible@stackhpc/2.8/rocky-linux
 cliff>=2.5.0,<2.15.0 # Apache
 netaddr!=0.7.16,>=0.7.13 # BSD
 PyYAML>=3.10.0 # MIT
