@@ -162,6 +162,12 @@ The following variables affect how Ansible accesses the remote hosts.
     User account to use for Kolla SSH access. Default is ``kolla``.
 ``kolla_ansible_group``
     Primary group of Kolla SSH user. Default is ``kolla``.
+``kolla_ansible_user_uid``
+    UID of Kolla SSH user. Default is ``1000`` or next availabl UID.
+``kolla_ansible_user_gid``
+    GID of Kolla SSH user. Default is to match UID.
+``kolla_ansible_user_home``
+    Home directory of Kolla SSH user. Default is ``/home/kolla``.
 ``kolla_ansible_become``
     Whether to use privilege escalation for all operations performed via Kolla
     Ansible. Default is ``false`` since the 8.0.0 Ussuri release.

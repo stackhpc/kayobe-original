@@ -29,6 +29,9 @@
             users:
               - username: "{{ kolla_ansible_user }}"
                 group: "{{ kolla_ansible_group }}"
+                uid: "{{ kolla_ansible_user_uid | default(omit) }}"
+                gid: "{{ kolla_ansible_user_gid | default(omit) }}"
+                home: "{{ kolla_ansible_user_home | default(omit) }}"
                 groups:
                   - docker
                   - sudo
