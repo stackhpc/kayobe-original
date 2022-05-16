@@ -15,6 +15,8 @@
   with_items: "{{ ntp_service_disable_list }}"
 
 - name: Remove kolla-ansible installed chrony container
+  vars:
+    ansible_python_interpreter: "{{ kolla_ansible_target_venv }}/bin/python"
   docker_container:
     name: chrony
     state: absent
