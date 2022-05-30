@@ -3,7 +3,7 @@
 # service.
 
 - name: Ensure overcloud host disk images are built and installed
-  hosts: seed
+  hosts: localhost
   tags:
     - overcloud-host-image-build
   vars:
